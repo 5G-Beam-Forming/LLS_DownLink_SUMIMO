@@ -95,11 +95,11 @@ public:
 	/* Related to result calculation */
 	field<umat>			coded_bit;
 	field<umat>			decoded_bit;
-	Result				Result;
+	Result				result;
 
 	/* Related to HARQ & feedback */
 	HARQBufferUE		HARQ_buffer;
-	feedback			feedback;
+	feedback			feedBack;
 
 	/* otherwise */
 	uword				cell_ID;

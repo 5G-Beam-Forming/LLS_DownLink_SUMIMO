@@ -893,12 +893,12 @@ void ModuleBS_SUMIMO::method_DMRS_allocation(ModuleParameterMIMO &para, int &ind
 		k_prime << 0 << 1 << endr;
 		l_prime << 0 << 1 << endr;
 
-		if (para.PDSCH_mapping_type == PDSCH_mapping_type::A)
+		if (para.pdsch_mapping_type == PDSCH_mapping_type::A)
 			if (para.DL_DMRS_typeA_pos == 3)
 				l_0 = 3;
 			else
 				l_0 = 2;
-		else if (para.PDSCH_mapping_type == PDSCH_mapping_type::B)
+		else if (para.pdsch_mapping_type == PDSCH_mapping_type::B)
 			if (this->PDCCH_5G_position(0, 1))
 				l_0 = 2;
 			else
@@ -949,12 +949,12 @@ void ModuleBS_SUMIMO::method_DMRS_allocation(ModuleParameterMIMO &para, int &ind
 		k_prime << 0 << 1 << endr;
 		l_prime << 0 << 1 << endr;
 
-		if (para.PDSCH_mapping_type == PDSCH_mapping_type::A)
+		if (para.pdsch_mapping_type == PDSCH_mapping_type::A)
 			if (para.DL_DMRS_typeA_pos == 3)
 				l_0 = 3;
 			else
 				l_0 = 2;
-		else if (para.PDSCH_mapping_type == PDSCH_mapping_type::B)
+		else if (para.pdsch_mapping_type == PDSCH_mapping_type::B)
 			if (this->PDCCH_5G_position(0, 1))
 				l_0 = 2;
 			else
@@ -2188,11 +2188,11 @@ void func_beam_selection(ModuleParameterMIMO &para, cx_cube &ch_est, cx_mat &Nbe
 						V = rec_beam_signal(ind_ana, ind_RB);
 
 						switch (para.ue_detection_mode) {
-						case ue_detection_mode::MMSE:
+						case Ue_detection_mode::MMSE:
 							inv_temp = solve((V.t() * V + para.sigma_n_freq * eye<cx_mat>(ind_rank + 1, ind_rank + 1)), V.t());
 							U = inv_temp * V;
 							break;
-						case ue_detection_mode::ZF:
+						case Ue_detection_mode::ZF:
 							inv_temp = pinv(V);
 							U = inv_temp * V;
 							break;
@@ -2262,11 +2262,11 @@ void func_beam_selection(ModuleParameterMIMO &para, cx_cube &ch_est, cx_mat &Nbe
 
 							V = rec_beam_signal(i3 * ind_ana * ind_temp, 0, ind_RB);
 							switch (para.ue_detection_mode) {
-							case ue_detection_mode::MMSE:
+							case Ue_detection_mode::MMSE:
 								inv_temp = solve((V.t() * V + para.sigma_n_freq * eye<cx_mat>(ind_rank + 1, ind_rank + 1)), V.t());
 								U = inv_temp * V;
 								break;
-							case ue_detection_mode::ZF:
+							case Ue_detection_mode::ZF:
 								inv_temp = pinv(V);
 								U = inv_temp * V;
 								break;
@@ -2317,11 +2317,11 @@ void func_beam_selection(ModuleParameterMIMO &para, cx_cube &ch_est, cx_mat &Nbe
 							V = rec_beam_signal(ind_ana, ind_dig, ind_RB);
 
 							switch (para.ue_detection_mode) {
-							case ue_detection_mode::MMSE:
+							case Ue_detection_mode::MMSE:
 								inv_temp = solve((V.t() * V + para.sigma_n_freq * eye<cx_mat>(ind_rank + 1, ind_rank + 1)), V.t());
 								U = inv_temp * V;
 								break;
-							case ue_detection_mode::ZF:
+							case Ue_detection_mode::ZF:
 								inv_temp = pinv(V);
 								U = inv_temp * V;
 								break;
@@ -2403,11 +2403,11 @@ void func_beam_selection(ModuleParameterMIMO &para, cx_cube &ch_est, cx_mat &Nbe
 
 								V = rec_beam_signal(i3 * ind_ana + ind_temp, ind_dig, ind_RB);
 								switch (para.ue_detection_mode) {
-								case ue_detection_mode::MMSE:
+								case Ue_detection_mode::MMSE:
 									inv_temp = solve((V.t() * V + para.sigma_n_freq * eye<cx_mat>(ind_rank + 1, ind_rank + 1)), V.t());
 									U = inv_temp * V;
 									break;
-								case ue_detection_mode::ZF:
+								case Ue_detection_mode::ZF:
 									inv_temp = pinv(V);
 									U = inv_temp * V;
 									break;

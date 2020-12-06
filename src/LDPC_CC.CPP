@@ -11,7 +11,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <armadillo>
-#include "susiso.h"
+#include "sumimo.h"
 #include "LDPC/stdafx.h"
 #include "LDPC/SISO_PDSCH.h"
 #include "LDPC/method_ChannelCoding.h"
@@ -53,7 +53,7 @@ void LDPC_C_initialization(NR_ChannelCoding &LDPC, int A, int G, int Qm, double 
 	//int n_PRB = atoi(argv[2]); // total number of allocated PRBs for the UE
 	int n_PRB     = 250;
 	int N_symb_sh = 12;			// 12 or 14, 12: with pilots or 14: without pilots
-								// limited buffer¸¦ ÀÌ¿ëÇÏ´Â °æ¿ì 13 OFDM symbols¸¦ scheduling ÇÔ
+								// limited bufferï¿½ï¿½ ï¿½Ì¿ï¿½ï¿½Ï´ï¿½ ï¿½ï¿½ï¿½ 13 OFDM symbolsï¿½ï¿½ scheduling ï¿½ï¿½
 
 	int *TBS_N_RE;
 	TBS_N_RE = new int[2];

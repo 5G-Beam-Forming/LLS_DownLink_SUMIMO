@@ -33,7 +33,7 @@ inline char HD(double input){
 		return(0);
 }
 
-inline int xor( int a, int b ) { 
+inline int xor2( int a, int b ) { 
 	return( (a || b) && !(a && b) ); 
 }
 
@@ -64,7 +64,7 @@ void NR_ChannelCoding::Rx_CodeBlockConcatenation (double *LLR)
 }
 
 
-void NR_ChannelCoding::Rx_RateMatching (NR_CODEC *nr_codec)	// additional coding  (NR_CODECÀ» inputÀ¸·Î ¹ÞÀ½)
+void NR_ChannelCoding::Rx_RateMatching (NR_CODEC *nr_codec)	// additional coding  (NR_CODECï¿½ï¿½ inputï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
 {
 
 	int cnt = 0;
@@ -86,7 +86,7 @@ void NR_ChannelCoding::Rx_RateMatching (NR_CODEC *nr_codec)	// additional coding
 	rv_id = nr_codec->harq.HARQ_index[nr_codec->harq.HARQ_iter] ;	// additional coding
 
 
-	/* ¼öÁ¤ Àü code
+	/* ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ code
 	//for (r=0; r<C; r++){
 	//	for(j=0; j<E[r]; j++){
 	//		if(j<K_p-2*Z_c){
@@ -95,7 +95,7 @@ void NR_ChannelCoding::Rx_RateMatching (NR_CODEC *nr_codec)	// additional coding
 	//		else if (j<N_cb-null_cnt){
 	//			rx_d[r][j+2*Z_c+null_cnt] = rx_e[r][j] ;
 	//		}
-	//		// rx_e¿¡¼­ rx_d¸¦ ÇÑ¹ø¸¸ ÀÐ¾î ¿Ã¶§´Â ¾Æ·¡ else if¿Í else´Â ÁÖ¼®Ã³¸®
+	//		// rx_eï¿½ï¿½ï¿½ï¿½ rx_dï¿½ï¿½ ï¿½Ñ¹ï¿½ï¿½ï¿½ ï¿½Ð¾ï¿½ ï¿½Ã¶ï¿½ï¿½ï¿½ ï¿½Æ·ï¿½ else ifï¿½ï¿½ elseï¿½ï¿½ ï¿½Ö¼ï¿½Ã³ï¿½ï¿½
 	//		else if ( (j>=N_cb-null_cnt) && (j%(N_cb-null_cnt)<K_p-2*Z_c) ){
 	//			rx_d[r][j%(N_cb-null_cnt)+2*Z_c] = rx_d[r][j%(N_cb-null_cnt)+2*Z_c] + rx_e[r][j] ;
 	//		}
@@ -107,8 +107,8 @@ void NR_ChannelCoding::Rx_RateMatching (NR_CODEC *nr_codec)	// additional coding
 	*/
 	
 
-	/* ¼öÁ¤ ÈÄ code */		// additional coding
-	// À§ code¸¦ //from ~ //to ±îÁö ¼öÁ¤
+	/* ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ code */		// additional coding
+	// ï¿½ï¿½ codeï¿½ï¿½ //from ~ //to ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	//from
 	for (r=0; r<C; r++){		
 		j = 0;					
@@ -198,7 +198,7 @@ void NR_ChannelCoding::Rx_LDPCDecoding (NR_CODEC *nr_codec)
 		}		
 		for(k=0; k<N_H; k++){
 			if(rx_d[r][k] != 0){
-				rx_d[r][k] = -rx_d[r][k] ; // demodulator°¡ LLR À» log p(1)/p(0)·Î Á¤ÀÇÇÔ
+				rx_d[r][k] = -rx_d[r][k] ; // demodulatorï¿½ï¿½ LLR ï¿½ï¿½ log p(1)/p(0)ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			}
 		}
 	}
@@ -255,7 +255,7 @@ void NR_ChannelCoding::Rx_LDPCDecoding (NR_CODEC *nr_codec)
 					QQ = 0 ;
 
 					for(k=0; k<row_weight[m]; k++){
-						QQ = xor(QQ, HD_Lq[r][max_row_weight*m+k]) ;
+						QQ = xor2(QQ, HD_Lq[r][max_row_weight*m+k]) ;
 						sort_reg[k] = fabs(Lq[r][max_row_weight*m+k]) ;
 					}
 
@@ -270,17 +270,17 @@ void NR_ChannelCoding::Rx_LDPCDecoding (NR_CODEC *nr_codec)
 						sort_reg[i] = tmp ;
 					}
 					for(k=0; k<row_weight[m]; k++){
-						tmp_QQ    = xor(QQ, HD_Lq[r][max_row_weight*m + k]) ;
+						tmp_QQ    = xor2(QQ, HD_Lq[r][max_row_weight*m + k]) ;
 						real_col  = col_index[max_row_weight*m + k] ;
-						tmp_QQ    = xor(tmp_QQ, HD_Y[r][real_col]) ;                   
+						tmp_QQ    = xor2(tmp_QQ, HD_Y[r][real_col]) ;                   
                     
 						if( fabs( Lq[r][max_row_weight*m + k]) == sort_reg[0] ){
-							//Lr[r][max_row_weight*m + k] = (double)( xor(tmp_QQ,1) - tmp_QQ) * sort_reg[1] ;
-							Lr[r][max_row_weight*m + k] = (double)( xor(tmp_QQ,1) - tmp_QQ) * sort_reg[1] *factor;
+							//Lr[r][max_row_weight*m + k] = (double)( xor2(tmp_QQ,1) - tmp_QQ) * sort_reg[1] ;
+							Lr[r][max_row_weight*m + k] = (double)( xor2(tmp_QQ,1) - tmp_QQ) * sort_reg[1] *factor;
 						}
 						else{
-							//Lr[r][max_row_weight*m + k] = (double)( xor(tmp_QQ,1) - tmp_QQ) * sort_reg[0] ;
-							Lr[r][max_row_weight*m + k] = (double)( xor(tmp_QQ,1) - tmp_QQ) * sort_reg[0] *factor;
+							//Lr[r][max_row_weight*m + k] = (double)( xor2(tmp_QQ,1) - tmp_QQ) * sort_reg[0] ;
+							Lr[r][max_row_weight*m + k] = (double)( xor2(tmp_QQ,1) - tmp_QQ) * sort_reg[0] *factor;
 						}
 					}
 					delete sort_reg ;
@@ -310,7 +310,7 @@ void NR_ChannelCoding::Rx_LDPCDecoding (NR_CODEC *nr_codec)
 
 				else if (decoding_type == 1){
 					rx_c_LLR[r][m] = fabs(rx_d[r][m]) + sum_Lr ;
-					X_hat[r][m] = xor(HD(rx_c_LLR[r][m]), HD_Y[r][m]) ;
+					X_hat[r][m] = xor2(HD(rx_c_LLR[r][m]), HD_Y[r][m]) ;
 					LLR_out[r][m] = rx_c_LLR[r][m] * Sign(rx_d[r][m]) ;
 				}
 			}
@@ -320,7 +320,7 @@ void NR_ChannelCoding::Rx_LDPCDecoding (NR_CODEC *nr_codec)
 				tmp_bit = 0;
 				for(k=0; k<row_weight[m]; k++){
 					real_col = col_index[k + max_row_weight*m] ;
-					tmp_bit = xor(tmp_bit, X_hat[r][real_col]) ;
+					tmp_bit = xor2(tmp_bit, X_hat[r][real_col]) ;
 				}
 				check = check + tmp_bit ;
 			}
@@ -347,7 +347,7 @@ void NR_ChannelCoding::Rx_LDPCDecoding (NR_CODEC *nr_codec)
 					if( Lq[r][max_row_weight*m + k] >= 0. )
 						HD_Lq[r][max_row_weight*m + k] = HD_Y[r][real_col] ;
 					else
-						HD_Lq[r][max_row_weight*m + k] = xor(HD_Y[r][real_col], 1);
+						HD_Lq[r][max_row_weight*m + k] = xor2(HD_Y[r][real_col], 1);
 				}
 			}
 		}//for (iter_cnt=0; iter_cnt<MAX_ITER; iter_cnt++){
@@ -379,7 +379,7 @@ void NR_ChannelCoding::Rx_Segmentation ()
 
 }
 
-// ±âÁ¸ Rx_CRC_Detachment code¸¦ ¾Æ·¡ÀÇ code·Î ±³Ã¼ // additional coding // additional coding // additional coding
+// ï¿½ï¿½ï¿½ï¿½ Rx_CRC_Detachment codeï¿½ï¿½ ï¿½Æ·ï¿½ï¿½ï¿½ codeï¿½ï¿½ ï¿½ï¿½Ã¼ // additional coding // additional coding // additional coding
 void NR_ChannelCoding::Rx_CRC_Detachment (NR_CODEC *nr_codec)	
 {
 	

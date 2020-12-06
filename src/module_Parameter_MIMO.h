@@ -65,9 +65,9 @@ enum class Rx_pattern_type {
 
 
 struct Channel {
-	ch_type				type;
-	ch_mode				time_fading;
-	time_correlation	time_correlation;
+	Ch_type				type;
+	Ch_mode				time_fading;
+	Time_correlation	time_correlation;
 	mat					PDP_dB;
 };
 
@@ -102,7 +102,7 @@ public:
 	irowvec				port_set_CSIRS;					// = ["3000", "3001", "3002", "3003", "3004", "3005", "3006", "3007", "3008", "3009", "3010", "3011", "3012", "3013", "3014", "3015", "3016", "3017", "3018", "3019", "3020", "3021", "3022", "3023", "3024", "3025", "3026", "3027", "3028", "3029", "3030", "3031"];
 	
 	int					CSIRS_density = 1;
-	CSIRS_CDMType		CSIRS_CDMType;					// = 'CDM8' 'no CDM', 'FD-CDM2', 'CDM4', 'CDM8'
+	CSIRS_CDMType		CSIRS_CDMtype;					// = 'CDM8' 'no CDM', 'FD-CDM2', 'CDM4', 'CDM8'
 	irowvec				CSIRS_bitmat_value;				// Fix this for now related with starting point of CSI-RS in freq. domain
 	irowvec				CSIRS_symbol_start_idx;			// Fix this for now related with starting point of CSI-RS in time domain
 	int					row_CSIRS;						// 1~ 19, TS 38.211 'Table 7.4.1.5.2-1: CSI-RS locations within a slot.'
@@ -110,8 +110,8 @@ public:
 	int					num_symb_in_slot = 14;
 	int					num_symb_in_subframe;
 
-	PDSCH_mapping_type	PDSCH_mapping_type;
-	DL_DMRS_config_type	DL_DMRS_config_type;
+	PDSCH_mapping_type	pdsch_mapping_type;
+	DL_DMRS_config_type	dl_dmrs_config_type;
 	int					DMRS_type = 1;
 	int					DL_DMRS_add_pos;
 	int					DL_DMRS_typeA_pos;
@@ -142,7 +142,7 @@ public:
 	/* Related to Scenario */
 	bool				cal_scenario = false;
 	int					scenario_beam = 1;
-	Sim_Case			Sim_Case;
+	Sim_Case			sim_Case;
 	double				BW;
 	double				f;									// Carrier frequency 2110e6 / 2.5e9
 
@@ -176,8 +176,8 @@ public:
 
 	irowvec				pol_slant_angle;					// polarization slant angle
 
-	TxArrayType			TxArrayType = TxArrayType::URA;		// Transmit array type (ULA or URA)
-	RxArrayType			RxArrayType = RxArrayType::URA;		// Receive array type (ULA or URA)
+	TxArrayType			txArrayType = TxArrayType::URA;		// Transmit array type (ULA or URA)
+	RxArrayType			rxArrayType = RxArrayType::URA;		// Receive array type (ULA or URA)
 
 	double				Tx_d_lambda = 0.5;					// Tx antenna spacing
 	double				Rx_d_lambda = 0.5;					// Rx antenna spacing
@@ -185,8 +185,8 @@ public:
 	int					Rx_pol;
 	int					Tx_downtilt = 0;
 
-	Tx_pattern_type		Tx_pattern_type = Tx_pattern_type::Pattern;				// 'Omni-directional' or 'Pattern'
-	Rx_pattern_type		Rx_pattern_type = Rx_pattern_type::Omni_directional;	// 'Omni-directional' or 'Pattern'
+	Tx_pattern_type		tx_pattern_type = Tx_pattern_type::Pattern;				// 'Omni-directional' or 'Pattern'
+	Rx_pattern_type		rx_pattern_type = Rx_pattern_type::Omni_directional;	// 'Omni-directional' or 'Pattern'
 
 	irowvec				TM;
 	irowvec				fixed_RI;
@@ -214,13 +214,13 @@ public:
 	mat					TDL;
 	double				user_speed = 0;						// (double) 5.0 / 6.0;	// [m/s], SUSISO
 
-	Channel				Channel;							// Channel.type, Channel.PDP_dB
+	Channel				channel;							// Channel.type, Channel.PDP_dB
 	mat					Cov_Matrix_time;
 	cx_mat				Cov_Matrix_freq;
 	double				Channel_coefRX;
 	double				Channel_coefTx;
 
-	method_interpolation	method_interpolation = method_interpolation::nearest_neighbor; // "sinc_interpolation" or "nearest_neighbor"
+	Method_interpolation	method_interpolation = Method_interpolation::nearest_neighbor; // "sinc_interpolation" or "nearest_neighbor"
 
 	int					sin_num = 10;						// Number of sin realizations
 	double				w_d;
@@ -238,15 +238,15 @@ public:
 	double				XPR_dB;
 
 	/* Relasted to channel estimation */
-	ch_est_mode			ch_est_mode = ch_est_mode::MMSE;
-	ch_est_mode_DMRS	ch_est_mode_DMRS = ch_est_mode_DMRS::MMSE;
-	ch_interp_mode		ch_interp_mode = ch_interp_mode::linear;
-	ch_interp_mode_DMRS	ch_interp_mode_DMRS = ch_interp_mode_DMRS::linear;
+	Ch_est_mode			ch_est_mode = Ch_est_mode::MMSE;
+	Ch_est_mode_DMRS	ch_est_mode_DMRS = Ch_est_mode_DMRS::MMSE;
+	Ch_interp_mode		ch_interp_mode = Ch_interp_mode::linear;
+	Ch_interp_mode_DMRS	ch_interp_mode_DMRS = Ch_interp_mode_DMRS::linear;
 
 	/* Related to channel codeing */
 	int					MCS_table_index = 1;				// whether use table 1 or 2 TS 38.214, Table 5.1.3.1-1, 5.1.3.1-2
 	double				ch_coding;
-	HARQ_switch			HARQ_switch;
+	HARQ_switch			harq_switch;
 	int					num_HARQ_retransmission = 0;		// 0, 1, 2, 3
 	int					num_HARQ_process = 8;
 	bool				hard_decision = false;
@@ -261,23 +261,23 @@ public:
 
 	/* Related to frequency syncronization */
 	int					sync_freq_offset = 0;						// Normalized frequency offset
-	sync_freq_mode		sync_freq_mode = sync_freq_mode::Perfect;	// "perfect", "estimated"
+	Sync_freq_mode		sync_freq_mode = Sync_freq_mode::Perfect;	// "perfect", "estimated"
 
 	/* Reated to Precoding */
 	int					subband;
 	irowvec				subband_set;
 
 	bool					zero_TTI_feedback = true;
-	zero_TTI_feedback_case	zero_TTI_feedback_case = zero_TTI_feedback_case::Perfect;
+	Zero_TTI_feedback_case	zero_TTI_feedback_case = Zero_TTI_feedback_case::Perfect;
 
-	precoder_case			precoder_case;
+	Precoder_case			precoder_case;
 	string					codebook;						// codebook file name include file extension
 
 	/* Related to receiver detection */
-	ue_detection_mode		ue_detection_mode = ue_detection_mode::MMSE;
+	Ue_detection_mode		ue_detection_mode = Ue_detection_mode::MMSE;
 	int						num_feed_bit = 10;
 	double					CB;
-	codebook_mode			codebook_mode = codebook_mode::Random;
+	Codebook_mode			codebook_mode = Codebook_mode::Random;
 
 
 	/* class member method definition */

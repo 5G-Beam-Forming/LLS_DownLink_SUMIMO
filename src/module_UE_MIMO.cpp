@@ -33,16 +33,16 @@ void ModuleUE_SUMIMO::module_UE_SUMIMO(ModuleParameterMIMO &para)
 
 	int num_slot_total = para.num_slot_in_subframe * para.num_subframe;
 
-	this->Result.ACK		  = zeros<irowvec>(num_slot_total);
-	this->Result.received_SNR = field<rowvec>(num_slot_total);
-	this->Result.suc_data	  = zeros<irowvec>(num_slot_total);
-	this->Result.Error_count  = zeros<irowvec>(num_slot_total);
-	this->Result.Totalbit	  = zeros<irowvec>(num_slot_total);
-	this->Result.suc_bit	  = zeros<irowvec>(num_slot_total);
+	this->result.ACK		  = zeros<irowvec>(num_slot_total);
+	this->result.received_SNR = field<rowvec>(num_slot_total);
+	this->result.suc_data	  = zeros<irowvec>(num_slot_total);
+	this->result.Error_count  = zeros<irowvec>(num_slot_total);
+	this->result.Totalbit	  = zeros<irowvec>(num_slot_total);
+	this->result.suc_bit	  = zeros<irowvec>(num_slot_total);
 
-	this->feedback.CQI.reset();
-	this->feedback.PMI = 1;
-	this->feedback.RI  = 1;
+	this->feedBack.CQI.reset();
+	this->feedBack.PMI = 1;
+	this->feedBack.RI  = 1;
 
 	this->HARQ_buffer.num_process = para.num_HARQ_process;
 	this->HARQ_buffer.retransmission = zeros<irowvec>(this->HARQ_buffer.num_process);
@@ -64,17 +64,17 @@ void ModuleUE_SUMIMO::module_UE_SUSISO(ModuleParameterMIMO &para) {
 
 	int num_slot_total = para.num_slot_in_subframe * para.num_subframe;
 
-	this->Result.ACK = zeros<irowvec>(num_slot_total);
-	this->Result.received_SNR = field<rowvec>(num_slot_total);
-	this->Result.suc_data = zeros<irowvec>(num_slot_total);
-	this->Result.Error_count = zeros<irowvec>(num_slot_total);
-	this->Result.Totalbit = zeros<irowvec>(num_slot_total);
-	this->Result.suc_bit = zeros<irowvec>(num_slot_total);
-	this->Result.suc_bit_data = zeros<irowvec>(num_slot_total);
+	this->result.ACK = zeros<irowvec>(num_slot_total);
+	this->result.received_SNR = field<rowvec>(num_slot_total);
+	this->result.suc_data = zeros<irowvec>(num_slot_total);
+	this->result.Error_count = zeros<irowvec>(num_slot_total);
+	this->result.Totalbit = zeros<irowvec>(num_slot_total);
+	this->result.suc_bit = zeros<irowvec>(num_slot_total);
+	this->result.suc_bit_data = zeros<irowvec>(num_slot_total);
 
-	this->feedback.CQI.clear();
-	this->feedback.ACK = zeros<irowvec>(1);
-	this->feedback.ACK(0) = 1;
+	this->feedBack.CQI.clear();
+	this->feedBack.ACK = zeros<irowvec>(1);
+	this->feedBack.ACK(0) = 1;
 
 	this->channel_buffer = field<cx_cube>(para.num_RB * para.num_sc, para.num_symb);
 	for (uword i = 0; i < para.num_RB * para.num_sc; i++)
@@ -140,8 +140,8 @@ void ModuleUE_SUMIMO::method_channel_filtering(ModuleParameterMIMO &para, Genie 
 	rowvec		temp_vec;
 	cx_mat		noise_received;
 
-	switch (para.Channel.time_fading) {
-	case ch_mode::Block_Fading:
+	switch (para.channel.time_fading) {
+	case Ch_mode::Block_Fading:
 		this->received_signal_stream = zeros<cx_mat>(genie.OFDM_signal_stream.n_rows, para.num_Rx_antenna);
 		for (uword ind_rx = 0; ind_rx < para.num_Rx_antenna; ind_rx++) {
 			temp_conv = zeros<cx_vec>(genie.OFDM_signal_stream.n_rows + ch_Output.time.n_slices - 1);
@@ -194,7 +194,7 @@ void ModuleUE_SUMIMO::method_synchronization(ModuleParameterMIMO &para, Genie &g
 	uword		index_argmax;
 
 	switch (para.sync_freq_mode) {
-	case sync_freq_mode::Perfect:
+	case Sync_freq_mode::Perfect:
 		temp_vec = zeros<rowvec>(this->received_signal_stream.n_rows);
 		for (uword i = 0; i < this->received_signal_stream.n_rows; i++)
 			temp_vec(i) = (double)i;
@@ -202,7 +202,7 @@ void ModuleUE_SUMIMO::method_synchronization(ModuleParameterMIMO &para, Genie &g
 		
 		temp_vec.reset();	// local memeory deallocation
 		break;
-	case sync_freq_mode::estimated:
+	case Sync_freq_mode::estimated:
 		/* Estimate the fractional frequencey offset (FFO) */
 		ind_ofdm_symbol(0) = para.size_fft + para.length_CP(0);
 		ind_ofdm_symbol(1) = para.size_fft + para.length_CP(0) + (para.size_fft + para.length_CP(1)) * (para.num_symb / 2 - 1);
@@ -441,11 +441,11 @@ void ModuleUE_SUMIMO::method_channel_estimation(ModuleParameterMIMO &para, Genie
 
 	/* Channel estimation for detection (LS, MMSE) */
 	switch (para.ch_est_mode_DMRS) {
-	case ch_est_mode_DMRS::Perfect:
+	case Ch_est_mode_DMRS::Perfect:
 		HV_hat = this->HV_perfect;
 		interpolation_DMRS = false;
 		break;
-	case ch_est_mode_DMRS::LS:
+	case Ch_est_mode_DMRS::LS:
 		/* For the phase2 calibration */
 		HV_temp = zeros<cx_cube>(para.num_RB * para.num_sc, para.num_symb, para.num_Rx_antenna);
 
@@ -528,7 +528,7 @@ void ModuleUE_SUMIMO::method_channel_estimation(ModuleParameterMIMO &para, Genie
 		interpolation_DMRS = true;
 		break;
 
-	case ch_est_mode_DMRS::MMSE:	/* 2D(freq-time) MMSE channel estimation */
+	case Ch_est_mode_DMRS::MMSE:	/* 2D(freq-time) MMSE channel estimation */
 		cx_mat	HV_temp;
 		cx_mat	received_grid_temp;
 		cx_mat	resource_grid_temp;
@@ -538,11 +538,11 @@ void ModuleUE_SUMIMO::method_channel_estimation(ModuleParameterMIMO &para, Genie
 		cx_mat	HV_temp_vec;
 		cx_mat	freq_cov, total_cov;
 
-		switch (para.Channel.time_fading) {
-		case ch_mode::Block_Fading:
+		switch (para.channel.time_fading) {
+		case Ch_mode::Block_Fading:
 			time_cov = toeplitz(ones<urowvec>(para.num_symb));
 			break;
-		case ch_mode::Fast_Fading:
+		case Ch_mode::Fast_Fading:
 			time_interval = zeros<rowvec>(para.num_symb);
 			double temp = 0.0;
 			for (uword ind = 0; ind < para.num_symb; ind++) {
@@ -555,7 +555,7 @@ void ModuleUE_SUMIMO::method_channel_estimation(ModuleParameterMIMO &para, Genie
 			// time_cov = toeplitz(besselj(0, 2.0 * PI * para.user_speed * para.f / para.light_speed * time_interval * 1.0 / para.Fs));
 
 			break;
-		}	/* end of switch (para.Channel.time_fading) */
+		}	/* end of switch (para.channel.time_fading) */
 
 
 		if (para.cal_scenario) {	/* MMSE estimation */
@@ -708,10 +708,10 @@ void ModuleUE_SUMIMO::method_channel_estimation(ModuleParameterMIMO &para, Genie
 		cx_vec	HV_temp, H_temp, temp;
 		uvec	inter_point, tempf, posi, posi_freq, posi_time;
 
-		switch (para.Channel.time_fading) {
-		case ch_mode::Block_Fading:
+		switch (para.channel.time_fading) {
+		case Ch_mode::Block_Fading:
 			switch (para.ch_interp_mode_DMRS) {
-			case ch_interp_mode_DMRS::linear:
+			case Ch_interp_mode_DMRS::linear:
 				cx_vec	HV_temp, temp;
 				uvec	inter_point;
 
@@ -730,9 +730,9 @@ void ModuleUE_SUMIMO::method_channel_estimation(ModuleParameterMIMO &para, Genie
 						}
 			}
 			break;
-		case ch_mode::Fast_Fading:
+		case Ch_mode::Fast_Fading:
 			switch (para.ch_interp_mode) {
-			case ch_interp_mode::linear:
+			case Ch_interp_mode::linear:
 				for (uword ind_rx = 0; ind_rx < para.num_Rx_antenna; ind_rx++)
 					for (uword ind_port = 0; ind_port < para.num_port; ind_port)
 						for (uword ind_RB = 0; ind_RB < para.num_RB; ind_RB++) {
@@ -756,7 +756,7 @@ void ModuleUE_SUMIMO::method_channel_estimation(ModuleParameterMIMO &para, Genie
 							}
 						}
 				break;
-			case ch_interp_mode::TDI:
+			case Ch_interp_mode::TDI:
 				cx_vec	H_temp = zeros<cx_vec>(H_hat.n_rows);
 				cx_vec	g_temp;
 				uword	threshold, last;
@@ -791,7 +791,7 @@ void ModuleUE_SUMIMO::method_channel_estimation(ModuleParameterMIMO &para, Genie
 				break;
 			}
 			break;
-		}	/* end of switch (para.Channel.time_fading) */
+		}	/* end of switch (para.channel.time_fading) */
 	}
 
 	this->HV_estimated = HV_hat;
@@ -965,7 +965,7 @@ void ModuleUE_SUMIMO::method_detection(ModuleParameterMIMO &para, Genie &genie)
 			H_estimated_temp_effective_temp = H_estimated_temp_effective.slice(0);
 
 			switch (para.ue_detection_mode) {
-			case ue_detection_mode::ZF:					/* Zero-forcing */
+			case Ue_detection_mode::ZF:					/* Zero-forcing */
 				Detection_matrix = pinv(H_estimated_temp_effective_temp);
 				Data_stream_detected = Detection_matrix * this->Data_stream.rows(find(indexf_temp)).t();
 				H_g = Detection_matrix * H_estimated_temp_effective_temp;
@@ -1011,7 +1011,7 @@ void ModuleUE_SUMIMO::method_detection(ModuleParameterMIMO &para, Genie &genie)
 
 				}
 				break;
-			case ue_detection_mode::MMSE:				/* MMSE */
+			case Ue_detection_mode::MMSE:				/* MMSE */
 				Detection_matrix = H_estimated_temp_effective_temp.t() * pinv(H_estimated_temp_effective_temp * H_estimated_temp_effective_temp.t() + this->sigma_n_freq * eye<cx_mat>(para.num_Rx_antenna, para.num_Rx_antenna));
 				
 				if (norm(Detection_matrix) < 0.01)
@@ -1056,7 +1056,7 @@ void ModuleUE_SUMIMO::method_detection(ModuleParameterMIMO &para, Genie &genie)
 					}
 				}
 				break;
-			case ue_detection_mode::Sphere_decoding:	/* Sphere decoding */
+			case Ue_detection_mode::Sphere_decoding:	/* Sphere decoding */
 				cx_mat		Q, R;
 				cx_mat		y_tilde_f, y_tilde_f_ZF;
 				umat		argmin_ZF;
@@ -1348,10 +1348,10 @@ void ModuleUE_SUMIMO::method_decoding(ModuleParameterMIMO &para, NR_ChannelCodin
 
 		this->decoded_bit(ind_codeword) = genie.ch_coding(ind_codeword).rx_a;
 		ACK = genie.ch_coding(ind_codeword).ACK_for_check;
-		this->feedback.ACK = ACK;
-		this->feedback.NACK_a = genie.ch_coding(ind_codeword).NACK_a;
-		this->feedback.NACK_b = genie.ch_coding(ind_codeword).NACK_b;
-		this->Result.ACK(ind_slot) = this->Result.ACK(ind_slot) + ACK;
+		this->feedBack.ACK = ACK;
+		this->feedBack.NACK_a = genie.ch_coding(ind_codeword).NACK_a;
+		this->feedBack.NACK_b = genie.ch_coding(ind_codeword).NACK_b;
+		this->result.ACK(ind_slot) = this->result.ACK(ind_slot) + ACK;
 
 		if (ACK || this->HARQ_buffer.retransmission(genie.HARQ_process_index(0)) == this->HARQ_buffer.max_retransmission) {
 			this->HARQ_buffer.num_TB = this->HARQ_buffer.num_TB + 1;
@@ -1383,7 +1383,7 @@ void ModuleUE_SUMIMO::method_Result(ModuleParameterMIMO &para, Genie &genie, int
 	cx_mat		Detection_matrix;
 	cx_mat		H_effective_temp;
 
-	if (para.Channel.time_fading == ch_mode::Block_Fading) {
+	if (para.channel.time_fading == Ch_mode::Block_Fading) {
 		sig_power = zeros<mat>(para.num_sc * para.num_RB, 1);
 		interf_power = zeros<mat>(para.num_sc * para.num_RB, 1);
 		noise_enhancement = zeros<colvec>(para.num_sc * para.num_RB, 1);
@@ -1403,23 +1403,23 @@ void ModuleUE_SUMIMO::method_Result(ModuleParameterMIMO &para, Genie &genie, int
 		}
 
 		/* Result */
-		this->Result.received_SNR_for_cali = mean(sig_power / (interf_power + para.sigma_n_freq * noise_enhancement));
-		this->Result.received_SNR(ind_slot) = (10.0 * log10((sig_power / (interf_power + para.sigma_n_freq * noise_enhancement)))).t();
+		this->result.received_SNR_for_cali = mean(sig_power / (interf_power + para.sigma_n_freq * noise_enhancement));
+		this->result.received_SNR(ind_slot) = (10.0 * log10((sig_power / (interf_power + para.sigma_n_freq * noise_enhancement)))).t();
 	}
 
 	int same_bit_cnt = 0, diff_bit_cnt = 0;
 	for (uword ind_codeword = 0; ind_codeword < genie.num_codewords; ind_codeword++) {
 
-		if (this->Result.ACK(ind_slot))
-			this->Result.suc_data(ind_slot) = para.num_data_bits(0);
+		if (this->result.ACK(ind_slot))
+			this->result.suc_data(ind_slot) = para.num_data_bits(0);
 		else
-			this->Result.suc_data(ind_slot) = 0;
+			this->result.suc_data(ind_slot) = 0;
 
 		same_bit_cnt = 0;
 		for (uword i = 0; i < genie.coded_bit_stream(ind_codeword).n_elem; i++)
 			if (genie.coded_bit_stream(ind_codeword)(i) == this->coded_bit(ind_codeword)(i))
 				same_bit_cnt++;
-		this->Result.suc_bit(ind_slot) = same_bit_cnt;
+		this->result.suc_bit(ind_slot) = same_bit_cnt;
 
 		same_bit_cnt = 0;
 		for (uword i = 0; i < genie.bit_stream(ind_codeword).n_elem; i++)
@@ -1428,9 +1428,9 @@ void ModuleUE_SUMIMO::method_Result(ModuleParameterMIMO &para, Genie &genie, int
 			else
 				diff_bit_cnt++;
 
-		this->Result.suc_bit_data(ind_slot) = same_bit_cnt;
+		this->result.suc_bit_data(ind_slot) = same_bit_cnt;
 
-		this->Result.Totalbit(ind_slot) = genie.coded_bit_stream(ind_codeword).n_elem;
+		this->result.Totalbit(ind_slot) = genie.coded_bit_stream(ind_codeword).n_elem;
 	}
 
 	/* local memory deallocation */

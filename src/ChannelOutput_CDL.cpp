@@ -48,7 +48,7 @@ void ChannelOutput_CDL(ModuleParameterMIMO &para, colvec &pathDelays, colvec &pa
 
 	int			Nt = para.num_Tx_antenna;
 	int			Nr = para.num_Rx_antenna;
-	ch_type		channel_type = para.Channel.type;
+	Ch_type		channel_type = para.channel.type;
 	double		user_speed = para.user_speed;
 	double		theta_v = para.theta_v;
 	double		phi_v = para.phi_v;
@@ -65,9 +65,9 @@ void ChannelOutput_CDL(ModuleParameterMIMO &para, colvec &pathDelays, colvec &pa
 
 	/* Antenna configuration */
 	// Transmit array type (ULA or URA)
-	TxArrayType TxArrayType = para.TxArrayType;	// for calibration
+	TxArrayType TxArrayType = para.txArrayType;	// for calibration
 	// Receive array type (ULA or URA)
-	RxArrayType RxArrayType = para.RxArrayType;	// for calibration
+	RxArrayType RxArrayType = para.rxArrayType;	// for calibration
 	// Transmit antenna spacing in wavelengths (0.1-100)
 	double		TxAnt = para.Tx_d_lambda;
 	// Receive antenna spacing in wavelengths (0.1-100)
@@ -156,31 +156,31 @@ void ChannelOutput_CDL(ModuleParameterMIMO &para, colvec &pathDelays, colvec &pa
 
 	/* R1-1700144 */
 	switch (channel_type) {
-	case ch_type::CDL_A:	// R1-1700144
+	case Ch_type::CDL_A:	// R1-1700144
 		mu_model_AoD =   -2.05;
 		mu_model_AoA = -164.40;
 		mu_model_ZoD =   97.27;
 		mu_model_ZoA =   87.68;
 		break;
-	case ch_type::CDL_B:	// R1-1700144
+	case Ch_type::CDL_B:	// R1-1700144
 		mu_model_AoD =  -4.96;
 		mu_model_AoA = 176.60;
 		mu_model_ZoD = 105.64;
 		mu_model_ZoA =  71.76;
 		break;
-	case ch_type::CDL_C:	// calculated by using R1-1700144
+	case Ch_type::CDL_C:	// calculated by using R1-1700144
 		mu_model_AoD = -19.6808;
 		mu_model_AoA = 149.8943;
 		mu_model_ZoD =  99.3310;
 		mu_model_ZoA =  73.4974;
 		break;
-	case ch_type::CDL_D:	// calculated by using R1-1700144
+	case Ch_type::CDL_D:	// calculated by using R1-1700144
 		mu_model_AoD =   1.9930;
 		mu_model_AoA = 178.1941;
 		mu_model_ZoD =  98.0897;
 		mu_model_ZoA =  81.5213;
 		break;
-	case ch_type::CDL_E:	// calculated by using R1-1700144
+	case Ch_type::CDL_E:	// calculated by using R1-1700144
 		mu_model_AoD =   2.8396;
 		mu_model_AoA = 179.2480;
 		mu_model_ZoD =  99.7957;
@@ -205,15 +205,15 @@ void ChannelOutput_CDL(ModuleParameterMIMO &para, colvec &pathDelays, colvec &pa
 	ZOAs_temp = AS_ratio * (ZOAs_temp - mu_model_ZoA) + mu_desired_ZoA;
 	
 	switch (channel_type) {
-	case ch_type::CDL_A:
+	case Ch_type::CDL_A:
 		GCS_to_LCS(0, para.Tx_downtilt, 0, ZODs_temp(1), AODs_temp(1), Ang_strong_cluster.ZOD, Ang_strong_cluster.AOD);
 		break;
-	case ch_type::CDL_C:
+	case Ch_type::CDL_C:
 		GCS_to_LCS(0, para.Tx_downtilt, 0, ZODs_temp(5), AODs_temp(5), Ang_strong_cluster.ZOD, Ang_strong_cluster.AOD);
 		break;
-	case ch_type::CDL_B:
-	case ch_type::CDL_D:
-	case ch_type::CDL_E:
+	case Ch_type::CDL_B:
+	case Ch_type::CDL_D:
+	case Ch_type::CDL_E:
 		GCS_to_LCS(0, para.Tx_downtilt, 0, ZODs_temp(0), AODs_temp(0), Ang_strong_cluster.ZOD, Ang_strong_cluster.AOD);
 		break;
 	}
@@ -254,7 +254,7 @@ void ChannelOutput_CDL(ModuleParameterMIMO &para, colvec &pathDelays, colvec &pa
 
 	/* For LOS environment, adjust subpath AoDs and AoAs such that the AoD
 	 * and AoA of the LOS component are aligned in line */
-	if (channel_type == ch_type::CDL_D || channel_type == ch_type::CDL_E) {
+	if (channel_type == Ch_type::CDL_D || channel_type == Ch_type::CDL_E) {
 		// Calculate the correct azimuth AoA for LOS case, which differ from azimuth AoD by 180 degrees
 		// Channel_Info(1, 4) denotes the azimuth AoD for LOS component
 		correctAzAOA = 180.0;		// AoA = 0 for both of CDL_D and CDL_E.
@@ -328,7 +328,7 @@ void ChannelOutput_CDL(ModuleParameterMIMO &para, colvec &pathDelays, colvec &pa
 	T = t.size();
 
 
-	switch (para.Tx_pattern_type) {
+	switch (para.tx_pattern_type) {
 	case Tx_pattern_type::Omni_directional:
 		Tx_patterns = ones<mat>(1, Num_ray * nTap);
 		break;
@@ -337,7 +337,7 @@ void ChannelOutput_CDL(ModuleParameterMIMO &para, colvec &pathDelays, colvec &pa
 		break;
 	}
 
-	switch (para.Rx_pattern_type) {
+	switch (para.rx_pattern_type) {
 	case Rx_pattern_type::Omni_directional:
 		Rx_patterns = ones<mat>(1, Num_ray * nTap);
 		break;

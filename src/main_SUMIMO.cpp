@@ -28,8 +28,8 @@ int			SLOT;
 
 /* local function declaration */
 string prStr_simCase(Sim_Case);
-string prStr_chType(ch_type);
-string prStr_chMode(ch_mode);
+string prStr_chType(Ch_type);
+string prStr_chMode(Ch_mode);
 
 
 
@@ -56,25 +56,25 @@ int main(int argc, char **argv)
 	NR_ChannelCoding		LDPC;
 
 	/* set init values */
-	init.Sim_Case = Sim_Case::SUMIMO;
+	init.sim_Case = Sim_Case::SUMIMO;
 	init.mu		  = 0;
 	init.BW		  = 10e6;
 	init.f		  = 4e9;
 	init.num_subframe = 20;
-	init.ch_type  = ch_type::CDL_A;
-	init.ch_mode  = ch_mode::Block_Fading;
+	init.ch_type  = Ch_type::CDL_A;
+	init.ch_mode  = Ch_mode::Block_Fading;
 	init.Tx_pol   = 2;
-	init.pol_tx   = pol_tx::cross_pol;
+	init.pol_tx   = Pol_tx::cross_pol;
 	init.num_Tx_antenna			   = 4;
 	init.num_Tx_antenna_horizontal = 2;
 	init.num_Tx_antenna_vertical   = 2;
 	init.Rx_pol	= 2;
-	init.pol_rx = pol_rx::cross_pol;
+	init.pol_rx = Pol_rx::cross_pol;
 	init.num_Rx_antenna			   = 1;
 	init.num_Rx_antenna_horizontal = 1;
 	init.num_Rx_antenna_vertical   = 1;
 	init.user_speed = 3.56;
-	init.HARQ_switch = HARQ_switch::off;
+	init.harq_switch = HARQ_switch::off;
 
 	irowvec		CQI(CQI_LENGTH);
 
@@ -85,7 +85,7 @@ int main(int argc, char **argv)
 	/* program banner printing */
 	cout << endl << endl;
 	cout << " *************************[ Simulation Starts ]*************************\n";
-	cout << "               Simulation case           : " << prStr_simCase(init.Sim_Case) << endl;
+	cout << "               Simulation case           : " << prStr_simCase(init.sim_Case) << endl;
 	cout << "               Bandwidth                 : "; printf("%5.2f [MHz]\n", init.BW / 1e6);
 	cout << "               Channel type              : " << prStr_chType(init.ch_type) << endl;
 	cout << "               Channel mode              : " << prStr_chMode(init.ch_mode) << endl;
@@ -142,20 +142,20 @@ int main(int argc, char **argv)
 			printf("  ----------------[ cqi = %llu, SNR = %5.2f dB, (%2d of %lu) ]----------------\n", CQI(ind_cqi), para.SNR, para.ind_SNR + 1, init.SNR_range.n_elem);
 			BS.module_BS_SUMIMO(para);
 			UE.module_UE_SUMIMO(para);
-			UE.feedback.CQI = zeros<irowvec>(CQI_LENGTH);
+			UE.feedBack.CQI = zeros<irowvec>(CQI_LENGTH);
 			for (int ind_slot = 0; ind_slot < num_slot_total; ind_slot++) {
 				SLOT = ind_slot + 1;
 				printf("  ..............[ cqi = %llu, SNR = %2d (%5.2f dB), slot = %d ]..............\n", CQI(ind_cqi), para.ind_SNR + 1, para.SNR, ind_slot + 1);
 				Chan.module_Channel_5G(para);
 				Chan_Output = Chan.Output;
-				UE.feedback.CQI(0) = CQI(ind_cqi);
-				BS.Process(para, LDPC, ind_slot, UE.feedback, Chan_Output);
+				UE.feedBack.CQI(0) = CQI(ind_cqi);
+				BS.Process(para, LDPC, ind_slot, UE.feedBack, Chan_Output);
 				UE.process(para, LDPC, BS.genie, Chan_Output, ind_slot);
 			}
 
 			/* Result */
-			BLER(ind_cqi)(ind_SNR) = 1.0 - (double)sum(UE.Result.ACK) / (double)UE.HARQ_buffer.num_TB;
-			Throughput(ind_cqi)(ind_SNR) = (double)sum(UE.Result.suc_data) / ((double)para.num_subframe * 0.001) / pow(10.0, 6.0);
+			BLER(ind_cqi)(ind_SNR) = 1.0 - (double)sum(UE.result.ACK) / (double)UE.HARQ_buffer.num_TB;
+			Throughput(ind_cqi)(ind_SNR) = (double)sum(UE.result.suc_data) / ((double)para.num_subframe * 0.001) / pow(10.0, 6.0);
 		}
 
 	}	/* end of for main loop */
@@ -232,34 +232,34 @@ string prStr_simCase(Sim_Case sim_case) {
 
 
 
-string prStr_chType(ch_type CType) {
+string prStr_chType(Ch_type CType) {
 
 	string strBox;
 
 	switch (CType) {
-	case ch_type::PedA:				strBox = "PedA";			break;
-	case ch_type::flat_Rayleigh:	strBox = "flat_Rayleigh";	break;
-	case ch_type::Rayleigh2:		strBox = "Rayleigh2";		break;
-	case ch_type::PedB:				strBox = "PedB";			break;
-	case ch_type::PedBcorr:			strBox = "PedBcorr";		break;
-	case ch_type::VehA:				strBox = "VehA";			break;
-	case ch_type::VehB:				strBox = "VehB";			break;
-	case ch_type::EPA5Hz:			strBox = "EPA5Hz";			break;
-	case ch_type::EVA5Hz:			strBox = "EVA5Hz";			break;
-	case ch_type::EVA70Hz:			strBox = "EVA70Hz";			break;
-	case ch_type::ETU70Hz:			strBox = "ETU70Hz";			break;
-	case ch_type::ETU300Hz:			strBox = "ETU300Hz";		break;
-	case ch_type::AWGN:				strBox = "AWGN";			break;
-	case ch_type::TDL_A:			strBox = "TDL_A";			break;
-	case ch_type::TDL_B:			strBox = "TDL_B";			break;
-	case ch_type::TDL_C:			strBox = "TDL_C";			break;
-	case ch_type::TDL_D:			strBox = "TDL_D";			break;
-	case ch_type::TDL_E:			strBox = "TDL_E";			break;
-	case ch_type::CDL_A:			strBox = "CDL_A";			break;
-	case ch_type::CDL_B:			strBox = "CDL_B";			break;
-	case ch_type::CDL_C:			strBox = "CDL_C";			break;
-	case ch_type::CDL_D:			strBox = "CDL_D";			break;
-	case ch_type::CDL_E:			strBox = "CDL_E";			break;
+	case Ch_type::PedA:				strBox = "PedA";			break;
+	case Ch_type::flat_Rayleigh:	strBox = "flat_Rayleigh";	break;
+	case Ch_type::Rayleigh2:		strBox = "Rayleigh2";		break;
+	case Ch_type::PedB:				strBox = "PedB";			break;
+	case Ch_type::PedBcorr:			strBox = "PedBcorr";		break;
+	case Ch_type::VehA:				strBox = "VehA";			break;
+	case Ch_type::VehB:				strBox = "VehB";			break;
+	case Ch_type::EPA5Hz:			strBox = "EPA5Hz";			break;
+	case Ch_type::EVA5Hz:			strBox = "EVA5Hz";			break;
+	case Ch_type::EVA70Hz:			strBox = "EVA70Hz";			break;
+	case Ch_type::ETU70Hz:			strBox = "ETU70Hz";			break;
+	case Ch_type::ETU300Hz:			strBox = "ETU300Hz";		break;
+	case Ch_type::AWGN:				strBox = "AWGN";			break;
+	case Ch_type::TDL_A:			strBox = "TDL_A";			break;
+	case Ch_type::TDL_B:			strBox = "TDL_B";			break;
+	case Ch_type::TDL_C:			strBox = "TDL_C";			break;
+	case Ch_type::TDL_D:			strBox = "TDL_D";			break;
+	case Ch_type::TDL_E:			strBox = "TDL_E";			break;
+	case Ch_type::CDL_A:			strBox = "CDL_A";			break;
+	case Ch_type::CDL_B:			strBox = "CDL_B";			break;
+	case Ch_type::CDL_C:			strBox = "CDL_C";			break;
+	case Ch_type::CDL_D:			strBox = "CDL_D";			break;
+	case Ch_type::CDL_E:			strBox = "CDL_E";			break;
 	default:						strBox = "UNSUPPORTED";
 	}
 	return strBox;
@@ -268,14 +268,14 @@ string prStr_chType(ch_type CType) {
 
 
 
-string prStr_chMode(ch_mode cMod) {
+string prStr_chMode(Ch_mode cMod) {
 
 	string strBox;
 
 	switch (cMod) {
-	case ch_mode::Block_Fading:		strBox = "Block_Fading";	break;
-	case ch_mode::Fast_Fading:		strBox = "Fast_Fading";		break;
-	case ch_mode::flat_Rayleigh:	strBox = "flat_Rayleigh";	break;
+	case Ch_mode::Block_Fading:		strBox = "Block_Fading";	break;
+	case Ch_mode::Fast_Fading:		strBox = "Fast_Fading";		break;
+	case Ch_mode::flat_Rayleigh:	strBox = "flat_Rayleigh";	break;
 	default:						strBox = "UNSUPPORTED";
 	}
 	return strBox;

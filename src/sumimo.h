@@ -45,7 +45,7 @@ enum class Sim_Case {
 };
 
 
-enum class ch_type {
+enum class Ch_type {
 	PedA,
 	flat_Rayleigh,
 	Rayleigh2,
@@ -75,7 +75,7 @@ enum class ch_type {
 
 
 
-enum class ch_mode {
+enum class Ch_mode {
 	Block_Fading,
 	Fast_Fading,
 	flat_Rayleigh,
@@ -83,21 +83,21 @@ enum class ch_mode {
 };
 
 
-enum class ch_est_mode {
+enum class Ch_est_mode {
 	Perfect,
 	LS,
 	MMSE,
 	UNSUPPORTED
 };
 
-enum class ch_est_mode_DMRS {
+enum class Ch_est_mode_DMRS {
 	Perfect,
 	LS,
 	MMSE,
 	UNSUPPORTED
 };
 
-enum class ch_interp_mode {
+enum class Ch_interp_mode {
 	linear,
 	nearest,
 	spline,
@@ -105,59 +105,59 @@ enum class ch_interp_mode {
 	UNSUPPORTED
 };
 
-enum class ch_interp_mode_DMRS {
+enum class Ch_interp_mode_DMRS {
 	linear,
 	UNSUPPORTED
 };
 
-enum class precoder_case {
+enum class Precoder_case {
 	ZF,
 	UNSUPPORTED
 };
 
-enum class time_correlation {
+enum class Time_correlation {
 	independent,
 	correlated,
 	UNSUPPORTED
 };
 
 
-enum class method_interpolation {
+enum class Method_interpolation {
 	nearest_neighbor,
 	sinc_interpolation,
 	UNSUPPORTED
 };
 
-enum class sync_freq_mode {
+enum class Sync_freq_mode {
 	Perfect,
 	estimated,
 	UNSUPPORTED
 };
 
-enum class zero_TTI_feedback_case {
+enum class Zero_TTI_feedback_case {
 	Perfect,
 	UNSUPPORTED
 };
 
-enum class ue_detection_mode {
+enum class Ue_detection_mode {
 	ZF,
 	MMSE,
 	Sphere_decoding,
 	UNSUPPORTED
 };
 
-enum class codebook_mode {
+enum class Codebook_mode {
 	Random,
 	DFT,
 	UNSUPPORTED
 };
 
-enum class pol_tx {
+enum class Pol_tx {
 	cross_pol,
 	UNSUPPORTED
 };
 
-enum class pol_rx {
+enum class Pol_rx {
 	cross_pol,
 	UNSUPPORTED
 };
@@ -351,17 +351,17 @@ enum class RANDOM_GEN {
 
 class ParameterInit {
 public:
-	Sim_Case		Sim_Case;			// SUSISO, SUMIMO
+	Sim_Case		sim_Case;			// SUSISO, SUMIMO
 	unsigned short	mu;					// numerology: [0 1 2 3] 
 	double			BW;					// Allowed values: [ 5 10 15 20 25 30 40 50 60 70 80 90 100 200 400 ] MHz
 	unsigned short	num_subframe;		// The number of subframe
-	ch_type			ch_type;			// Channel model type: 'AWGN', 'CDL_A', 'CDL_B', 'CDL_C', 'CDL_D',  'CDL_E', ..., 'PedA', 'PedB', 'VehA', 'flat Rayleigh' ...
-	ch_mode			ch_mode;			// 'Block_Fading' or 'Fast_Fading' % 'flat Rayleigh' - Block_Fading only / 'Rayleigh2' - Fast_fading only
-	ch_est_mode		ch_est_mode;
-	ch_est_mode_DMRS	ch_est_mode_DMRS;
+	Ch_type			ch_type;			// Channel model type: 'AWGN', 'CDL_A', 'CDL_B', 'CDL_C', 'CDL_D',  'CDL_E', ..., 'PedA', 'PedB', 'VehA', 'flat Rayleigh' ...
+	Ch_mode			ch_mode;			// 'Block_Fading' or 'Fast_Fading' % 'flat Rayleigh' - Block_Fading only / 'Rayleigh2' - Fast_fading only
+	Ch_est_mode		ch_est_mode;
+	Ch_est_mode_DMRS	ch_est_mode_DMRS;
 	double			f;					// Carrier frequencys
-	pol_tx			pol_tx;
-	pol_rx			pol_rx;
+	Pol_tx			pol_tx;
+	Pol_rx			pol_rx;
 
 	unsigned short	num_Tx_antenna;
 	bool			num_Tx_antenna_isExist = true;
@@ -379,7 +379,7 @@ public:
 	int				num_Rx_antenna_vertical;
 
 	double			user_speed;
-	HARQ_switch		HARQ_switch;
+	HARQ_switch		harq_switch;
 	mat				SNR_range;
 	bool			SNR_range_isExist = true;
 	bool			SNR_range_isDirty = false;
@@ -407,7 +407,7 @@ public:
 
 
 
-struct execTime {	// Release verision ¿¡¼­´Â »èÁ¦ ¿¹Á¤
+struct execTime {	// Release verision ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	clock_t				start;
 	clock_t				end;
 	clock_t				initTime;

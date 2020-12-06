@@ -49,7 +49,7 @@ void ModuleParameterMIMO::module_Parameter_MIMO(const ParameterInit &init)
 	this->phi_v = 45.0;
 
 	/* Parameters determined by scenario */
-	this->Sim_Case = init.Sim_Case;
+	this->sim_Case = init.sim_Case;
 	this->BW = init.BW;
 
 	if (init.SNR_range_isDirty)
@@ -63,11 +63,11 @@ void ModuleParameterMIMO::module_Parameter_MIMO(const ParameterInit &init)
 	this->num_slot_in_subframe = (int)pow(2, this->mu);
 
 	switch (init.ch_mode) {
-	case ch_mode::Block_Fading:
+	case Ch_mode::Block_Fading:
 		this->t = zeros<rowvec>(1);
 		this->t(0) = 0.0;
 		break;
-	case ch_mode::Fast_Fading:
+	case Ch_mode::Fast_Fading:
 		this->t = zeros<rowvec>(this->num_symb);
 		for (i = 0; i < this->num_symb; i++)
 			this->t(i) = i;
@@ -75,7 +75,7 @@ void ModuleParameterMIMO::module_Parameter_MIMO(const ParameterInit &init)
 		break;
 	default:
 		;
-	}   /* end of switch(init.ch_mode) */
+	}   /* end of switch(init.Ch_mode) */
 
 	/* TS 38.104 table 5.3.2 */
 	switch (this->mu) {
@@ -188,7 +188,7 @@ void ModuleParameterMIMO::module_Parameter_MIMO(const ParameterInit &init)
 		this->size_fft = 1536;
 	else if (this->BW == 15e6 && this->subcarrier_spacing == 7.5e3)
 		this->size_fft = 1536 * 2;
-	else if (this->num_RB == 1 && init.ch_type == ch_type::CDL_A)
+	else if (this->num_RB == 1 && init.ch_type == Ch_type::CDL_A)
 		this->size_fft = 31;
 	else
 		this->size_fft = pow(2, ceil(log2(this->num_RB * this->num_sc)));
@@ -204,11 +204,11 @@ void ModuleParameterMIMO::module_Parameter_MIMO(const ParameterInit &init)
 		this->N1 = init.num_Tx_antenna_horizontal;
 		this->N2 = init.num_Tx_antenna_vertical;
 		this->num_Tx_antenna = init.num_Tx_antenna_horizontal * init.num_Tx_antenna_vertical * this->Tx_pol;
-		this->TxArrayType = TxArrayType::URA;
+		this->txArrayType = TxArrayType::URA;
 	}
 	else if (init.num_Tx_antenna_isExist) {
 		this->num_Rx_antenna = init.num_Rx_antenna;
-		this->TxArrayType = TxArrayType::ULA;
+		this->txArrayType = TxArrayType::ULA;
 	}
 	else
 		perror("Input the number of transmit antennas.\n");
@@ -218,11 +218,11 @@ void ModuleParameterMIMO::module_Parameter_MIMO(const ParameterInit &init)
 		this->M1 = init.num_Rx_antenna_horizontal;
 		this->M2 = init.num_Rx_antenna_vertical;
 		this->num_Rx_antenna = init.num_Rx_antenna_horizontal * init.num_Rx_antenna_vertical * this->Rx_pol;
-		this->RxArrayType = RxArrayType::URA;
+		this->rxArrayType = RxArrayType::URA;
 	}
 	else if (init.num_Rx_antenna_isDirty) {
 		this->num_Rx_antenna = init.num_Rx_antenna * this->Rx_pol;
-		this->RxArrayType = RxArrayType::ULA;
+		this->rxArrayType = RxArrayType::ULA;
 	}
 	else
 		perror("Input the number of Receive antennas\n");
@@ -275,42 +275,42 @@ void ModuleParameterMIMO::module_Parameter_MIMO(const ParameterInit &init)
 	}   /* end of if (init.cal_scenario_isExist && init.cal_scenario) */
 
 	switch (init.ch_type) {
-	case ch_type::TDL_A:
-	case ch_type::TDL_B:
-	case ch_type::TDL_C:
-	case ch_type::TDL_D:
-	case ch_type::TDL_E:
-	case ch_type::CDL_A:
-	case ch_type::CDL_B:
-	case ch_type::CDL_C:
-	case ch_type::CDL_D:
-	case ch_type::CDL_E:
+	case Ch_type::TDL_A:
+	case Ch_type::TDL_B:
+	case Ch_type::TDL_C:
+	case Ch_type::TDL_D:
+	case Ch_type::TDL_E:
+	case Ch_type::CDL_A:
+	case Ch_type::CDL_B:
+	case Ch_type::CDL_C:
+	case Ch_type::CDL_D:
+	case Ch_type::CDL_E:
 		this->DS = 100.0 * 1e-9;
 	}
 
 	/* RS initial setting */
-	this->PDSCH_mapping_type = PDSCH_mapping_type::A;
-	this->DL_DMRS_config_type = DL_DMRS_config_type::type_2;
+	this->pdsch_mapping_type = PDSCH_mapping_type::A;
+	this->dl_dmrs_config_type = DL_DMRS_config_type::type_2;
 	this->DL_DMRS_typeA_pos = 3;
 	this->DL_DMRS_max_len = 2;
 	this->pos_last_PDSCH_symbol = 12;
 	this->DL_DMRS_add_pos = 1;
 	this->CSIRS_periodicity = 5;
 
-	switch (this->Sim_Case) {
+	switch (this->sim_Case) {
 	case Sim_Case::SUSISO:
 		this->ch_est_mode_DMRS = init.ch_est_mode_DMRS;
 		this->row_CSIRS = init.CSIRS_row;
 		this->CSIRS_density = init.CSIRS_density;
 		this->CSIRS_periodicity = init.CSIRS_periodicity;
 		this->DMRS_type = init.DMRS_config;
-		this->PDSCH_mapping_type = init.PDSCH_type;
+		this->pdsch_mapping_type = init.PDSCH_type;
 
 		this->port_set << 1000 << endr;
 		this->port_set_DMRS << 1000 << endr;
 		this->port_set_CSIRS << 3000 << endr;
 										
-		this->CSIRS_CDMType = CSIRS_CDMType::NO_CDM;
+		this->CSIRS_CDMtype = CSIRS_CDMType::NO_CDM;
 		this->row_CSIRS = 1;		// 1 ~ 19, TS 38.211 'Table 7.4.1.5.2-1: CSI-RS locations within a slot.'
 
 		/* power */
@@ -356,13 +356,13 @@ void ModuleParameterMIMO::module_Parameter_MIMO(const ParameterInit &init)
 	method_calculation();			// invoke class member method
 
 	/* Setting for channel model */
-	this->Channel.type = init.ch_type;
-	this->Channel.time_fading = init.ch_mode;
-	this->Channel.time_correlation = time_correlation::independent;		// corelated or independent
+	this->channel.type = init.ch_type;
+	this->channel.time_fading = init.ch_mode;
+	this->channel.time_correlation = Time_correlation::independent;		// corelated or independent
 
 	this->Cov_Matrix_time = zeros<mat>(this->size_fft, this->size_fft);
-	switch (this->Channel.type) {
-	case ch_type::TDL_A:	// Table 7.7.2-1
+	switch (this->channel.type) {
+	case Ch_type::TDL_A:	// Table 7.7.2-1
 		TDL << 0.0000 << -13.4 << endr
 			<< 0.3819 <<   0.0 << endr
 			<< 0.4025 <<  -2.2 << endr
@@ -386,19 +386,19 @@ void ModuleParameterMIMO::module_Parameter_MIMO(const ParameterInit &init)
 			<< 5.0066 << -16.6 << endr
 			<< 5.3043 << -19.9 << endr
 			<< 9.6586 << -29.7 << endr;
-		this->Channel.PDP_dB = zeros(arma::size(TDL.t()));
-		this->Channel.PDP_dB = join_horiz(TDL.col(1), (TDL.col(0) * this->DS)).t();
+		this->channel.PDP_dB = zeros(arma::size(TDL.t()));
+		this->channel.PDP_dB = join_horiz(TDL.col(1), (TDL.col(0) * this->DS)).t();
 
-		PDP_Delay = zeros<rowvec>(this->Channel.PDP_dB.n_cols);
-		PDP_Delay = this->Channel.PDP_dB.row(1);
-		New_PDP_Delay_samples = zeros<rowvec>(this->Channel.PDP_dB.n_cols);
+		PDP_Delay = zeros<rowvec>(this->channel.PDP_dB.n_cols);
+		PDP_Delay = this->channel.PDP_dB.row(1);
+		New_PDP_Delay_samples = zeros<rowvec>(this->channel.PDP_dB.n_cols);
 		New_PDP_Delay_samples = round(PDP_Delay * this->Fs);
 		for (uword ind = 0; ind < New_PDP_Delay_samples.n_elem; ind++) {
 			diag_index = New_PDP_Delay_samples(ind);
-			this->Cov_Matrix_time(diag_index, diag_index) = this->Cov_Matrix_time(diag_index, diag_index) + pow(10.0, this->Channel.PDP_dB(0, ind) / 10.0);
+			this->Cov_Matrix_time(diag_index, diag_index) = this->Cov_Matrix_time(diag_index, diag_index) + pow(10.0, this->channel.PDP_dB(0, ind) / 10.0);
 		}
 		break;
-	case ch_type::TDL_B:	// Table 7.7.2-2
+	case Ch_type::TDL_B:	// Table 7.7.2-2
 		TDL << 0.0000 <<   0.0 << endr
 			<< 0.1072 <<  -2.2 << endr
 			<< 0.2155 <<  -4.0 << endr
@@ -422,19 +422,19 @@ void ModuleParameterMIMO::module_Parameter_MIMO(const ParameterInit &init)
 			<< 4.1067 << -14.9 << endr
 			<< 4.2790 <<  -9.2 << endr
 			<< 4.7834 << -11.3 << endr;
-		this->Channel.PDP_dB = zeros(arma::size(TDL.t()));
-		this->Channel.PDP_dB = join_horiz(TDL.col(1), (TDL.col(0) * this->DS)).t();
+		this->channel.PDP_dB = zeros(arma::size(TDL.t()));
+		this->channel.PDP_dB = join_horiz(TDL.col(1), (TDL.col(0) * this->DS)).t();
 
-		PDP_Delay = zeros<rowvec>(this->Channel.PDP_dB.n_cols);
-		PDP_Delay = this->Channel.PDP_dB.row(1);
-		New_PDP_Delay_samples = zeros<rowvec>(this->Channel.PDP_dB.n_cols);
+		PDP_Delay = zeros<rowvec>(this->channel.PDP_dB.n_cols);
+		PDP_Delay = this->channel.PDP_dB.row(1);
+		New_PDP_Delay_samples = zeros<rowvec>(this->channel.PDP_dB.n_cols);
 		New_PDP_Delay_samples = round(PDP_Delay * this->Fs);
 		for (uword ind = 0; ind < New_PDP_Delay_samples.n_elem; ind++) {
 			diag_index = New_PDP_Delay_samples(ind);
-			this->Cov_Matrix_time(diag_index, diag_index) = this->Cov_Matrix_time(diag_index, diag_index) + pow(10.0, this->Channel.PDP_dB(0, ind) / 10.0);
+			this->Cov_Matrix_time(diag_index, diag_index) = this->Cov_Matrix_time(diag_index, diag_index) + pow(10.0, this->channel.PDP_dB(0, ind) / 10.0);
 		}
 		break;
-	case ch_type::TDL_C:		// Table 7.7.2-3
+	case Ch_type::TDL_C:		// Table 7.7.2-3
 		TDL << 0.0000 <<  -4.4 << endr
 			<< 0.2099 <<  -1.2 << endr
 			<< 0.2219 <<  -3.5 << endr
@@ -459,19 +459,19 @@ void ModuleParameterMIMO::module_Parameter_MIMO(const ParameterInit &init)
 			<< 6.6374 << -15.7 << endr
 			<< 7.0427 << -21.6 << endr
 			<< 8.6523 << -22.8 << endr;
-		this->Channel.PDP_dB = zeros(arma::size(TDL.t()));
-		this->Channel.PDP_dB = join_horiz(TDL.col(1), (TDL.col(0) * this->DS)).t();
+		this->channel.PDP_dB = zeros(arma::size(TDL.t()));
+		this->channel.PDP_dB = join_horiz(TDL.col(1), (TDL.col(0) * this->DS)).t();
 
-		PDP_Delay = zeros<rowvec>(this->Channel.PDP_dB.n_cols);
-		PDP_Delay = this->Channel.PDP_dB.row(1);
-		New_PDP_Delay_samples = zeros<rowvec>(this->Channel.PDP_dB.n_cols);
+		PDP_Delay = zeros<rowvec>(this->channel.PDP_dB.n_cols);
+		PDP_Delay = this->channel.PDP_dB.row(1);
+		New_PDP_Delay_samples = zeros<rowvec>(this->channel.PDP_dB.n_cols);
 		New_PDP_Delay_samples = round(PDP_Delay * this->Fs);
 		for (size_t ind = 0; ind < New_PDP_Delay_samples.n_elem; ind++) {
 			diag_index = New_PDP_Delay_samples(ind);
-			this->Cov_Matrix_time(diag_index, diag_index) = this->Cov_Matrix_time(diag_index, diag_index) + pow(10.0, this->Channel.PDP_dB(0, ind) / 10.0);
+			this->Cov_Matrix_time(diag_index, diag_index) = this->Cov_Matrix_time(diag_index, diag_index) + pow(10.0, this->channel.PDP_dB(0, ind) / 10.0);
 		}
 		break;
-	case ch_type::TDL_D:		// Table 7.7.2-4
+	case Ch_type::TDL_D:		// Table 7.7.2-4
 		TDL << 0.0000 <<  -0.2 << endr
 			<< 0.0350 << -18.8 << endr
 			<< 0.6120 << -21.0 << endr
@@ -485,19 +485,19 @@ void ModuleParameterMIMO::module_Parameter_MIMO(const ParameterInit &init)
 			<< 9.4240 << -24.8 << endr
 			<< 9.7080 << -30.0 << endr
 			<< 12.5250 << -27.7 << endr;
-		this->Channel.PDP_dB = zeros(arma::size(TDL.t()));
-		this->Channel.PDP_dB = join_horiz(TDL.col(1), (TDL.col(0) * this->DS)).t();
+		this->channel.PDP_dB = zeros(arma::size(TDL.t()));
+		this->channel.PDP_dB = join_horiz(TDL.col(1), (TDL.col(0) * this->DS)).t();
 
-		PDP_Delay = zeros<rowvec>(this->Channel.PDP_dB.n_cols);
-		PDP_Delay = this->Channel.PDP_dB.row(1);
-		New_PDP_Delay_samples = zeros<rowvec>(this->Channel.PDP_dB.n_cols);
+		PDP_Delay = zeros<rowvec>(this->channel.PDP_dB.n_cols);
+		PDP_Delay = this->channel.PDP_dB.row(1);
+		New_PDP_Delay_samples = zeros<rowvec>(this->channel.PDP_dB.n_cols);
 		New_PDP_Delay_samples = round(PDP_Delay * this->Fs);
 		for (size_t ind = 0; ind < New_PDP_Delay_samples.n_elem; ind++) {
 			diag_index = New_PDP_Delay_samples(ind);
-			this->Cov_Matrix_time(diag_index, diag_index) = this->Cov_Matrix_time(diag_index, diag_index) + pow(10.0, this->Channel.PDP_dB(0, ind) / 10.0);
+			this->Cov_Matrix_time(diag_index, diag_index) = this->Cov_Matrix_time(diag_index, diag_index) + pow(10.0, this->channel.PDP_dB(0, ind) / 10.0);
 		}
 		break;
-	case ch_type::TDL_E:		// Table 7.7.2-5
+	case Ch_type::TDL_E:		// Table 7.7.2-5
 		TDL << 0.0000  << -0.03 << endr
 			<< 0.5133  << -15.8 << endr
 			<< 0.5440  << -18.1 << endr
@@ -512,41 +512,41 @@ void ModuleParameterMIMO::module_Parameter_MIMO(const ParameterInit &init)
 			<< 5.4524  << -20.2 << endr
 			<< 12.0034 << -29.8 << endr
 			<< 20.6519 << -29.2 << endr;
-		this->Channel.PDP_dB = zeros(arma::size(TDL.t()));
-		this->Channel.PDP_dB = join_horiz(TDL.col(1), (TDL.col(0) * this->DS)).t();
+		this->channel.PDP_dB = zeros(arma::size(TDL.t()));
+		this->channel.PDP_dB = join_horiz(TDL.col(1), (TDL.col(0) * this->DS)).t();
 
-		PDP_Delay = zeros<rowvec>(this->Channel.PDP_dB.n_cols);
-		PDP_Delay = this->Channel.PDP_dB.row(1);
-		New_PDP_Delay_samples = zeros<rowvec>(this->Channel.PDP_dB.n_cols);
+		PDP_Delay = zeros<rowvec>(this->channel.PDP_dB.n_cols);
+		PDP_Delay = this->channel.PDP_dB.row(1);
+		New_PDP_Delay_samples = zeros<rowvec>(this->channel.PDP_dB.n_cols);
 		New_PDP_Delay_samples = round(PDP_Delay * this->Fs);
 		for (size_t ind = 0; ind < New_PDP_Delay_samples.n_elem; ind++) {
 			diag_index = New_PDP_Delay_samples(ind);
-			this->Cov_Matrix_time(diag_index, diag_index) = this->Cov_Matrix_time(diag_index, diag_index) + pow(10.0, this->Channel.PDP_dB(0, ind) / 10.0);
+			this->Cov_Matrix_time(diag_index, diag_index) = this->Cov_Matrix_time(diag_index, diag_index) + pow(10.0, this->channel.PDP_dB(0, ind) / 10.0);
 		}
 		break;
-	case ch_type::PedA:
-		this->Channel.PDP_dB << 0.0 << -9.7 << -19.2 << -22.8 << endr
+	case Ch_type::PedA:
+		this->channel.PDP_dB << 0.0 << -9.7 << -19.2 << -22.8 << endr
 			<< 0.0 << 110.0 * pow(10.0, -9.0) << 190.0 * pow(10.0, -9.0) << 410.0 * pow(10.0, -9.0) << endr;
 		this->Cov_Matrix_time(0, 0) = 1.0 + pow(pow(10.0, -2.28), 2.0) + pow(pow(10.0, -1.92), 2.0);
 		this->Cov_Matrix_time(1, 1) = pow(pow(10.0, -2.28), 2.0);
 		break;
-	case ch_type::flat_Rayleigh:
-	case ch_type::Rayleigh2:
-		this->Channel.PDP_dB << 0.0 << endr
+	case Ch_type::flat_Rayleigh:
+	case Ch_type::Rayleigh2:
+		this->channel.PDP_dB << 0.0 << endr
 			<< 0.0 << endr;
 		this->Cov_Matrix_time(0, 0) = 1.0;
 		break;
-	case ch_type::PedB:
-	case ch_type::PedBcorr:
-		this->Channel.PDP_dB << 0.0 << -0.9 << -4.9 << -8.0 << -7.8 << -23.9 << endr
+	case Ch_type::PedB:
+	case Ch_type::PedBcorr:
+		this->channel.PDP_dB << 0.0 << -0.9 << -4.9 << -8.0 << -7.8 << -23.9 << endr
 			<< 0.0 << 200.0 * pow(10.0, -9.0) << 800.0 * pow(10.0, -9.0) << 1200.0 * pow(10.0, -9.0) << 2300.0 * pow(10.0, -9.0) << 3700.0 * pow(10.0, -9.0) << endr;
 		this->Cov_Matrix_time(0, 0) = 1.0 + pow(10.0, -0.09);
 		this->Cov_Matrix_time(2, 2) = pow(10.0, -0.49) + pow(10.0, -0.8);
 		this->Cov_Matrix_time(4, 4) = pow(10.0, -0.78);
 		this->Cov_Matrix_freq(7, 7) = pow(10.0, -2.39);
 		break;
-	case ch_type::VehA:
-		this->Channel.PDP_dB << 0.0 << -1.0 << -9.0 << -10.0 << -15.0 << -20.0 << endr
+	case Ch_type::VehA:
+		this->channel.PDP_dB << 0.0 << -1.0 << -9.0 << -10.0 << -15.0 << -20.0 << endr
 			<< 0.0 << 310.0 * pow(10.0, -9.0) << 710.0 * pow(10.0, -9.0) << 1090.0 * pow(10.0, -9.0) << 1730.0 * pow(10.0, -9.0) << 2510.0 * pow(10.0, -9.0) << endr;
 		this->Cov_Matrix_time(0, 0) = 1.0;
 		this->Cov_Matrix_time(1, 1) = pow(10.0, -0.1) + pow(10.0, -0.9);
@@ -554,8 +554,8 @@ void ModuleParameterMIMO::module_Parameter_MIMO(const ParameterInit &init)
 		this->Cov_Matrix_time(3, 3) = pow(10.0, -1.5);
 		this->Cov_Matrix_time(5, 5) = pow(10.0, -2.0);
 		break;
-	case ch_type::VehB:
-		this->Channel.PDP_dB << -2.5 << 0.0 << -12.8 << -10.0 << -25.2 << -16.0 << endr
+	case Ch_type::VehB:
+		this->channel.PDP_dB << -2.5 << 0.0 << -12.8 << -10.0 << -25.2 << -16.0 << endr
 			<< 0.0 << 300.0 * pow(10.0, -9.0) << 8900.0 * pow(10.0, -9.0) << 12900.0 * pow(10.0, -9.0) << 17100.0 * pow(10.0, -9.0) << 20000.0 * pow(10.0, -9.0) << endr;
 		this->Cov_Matrix_time(0, 0) = pow(10.0, -0.25);
 		this->Cov_Matrix_time(1, 1) = 1.0;
@@ -564,14 +564,14 @@ void ModuleParameterMIMO::module_Parameter_MIMO(const ParameterInit &init)
 		this->Cov_Matrix_time(33, 33) = pow(10.0, -2.51);
 		this->Cov_Matrix_time(38, 38) = pow(10.0, -1.6);
 		break;
-	case ch_type::EPA5Hz:		// extended multipath channel model
-		this->Channel.PDP_dB << 0.0 << -1.0 << -2.0 << -3.0 << -8.0 << -17.2 << -20.8 << endr
+	case Ch_type::EPA5Hz:		// extended multipath channel model
+		this->channel.PDP_dB << 0.0 << -1.0 << -2.0 << -3.0 << -8.0 << -17.2 << -20.8 << endr
 			<< 0.0 << 30.0 * pow(10.0, -9.0) << 70.0 * pow(10.0, -9.0) << 90.0 * pow(10.0, -9.0) << 110.0 * pow(10.0, -9.0) << 190.0 * pow(10.0, -9.0) << 410.0 * pow(10.0, -9.0) << endr;
 		this->Cov_Matrix_time(0, 0) = 1.0 + pow(10.0, -1.0) + pow(10.0, -0.2) + pow(10.0, -0.3) + pow(10.0, -0.8) + pow(10.0, -1.72);
 		this->Cov_Matrix_time(1, 1) = pow(10.0, -2.08);
 		break;
-	case ch_type::EVA5Hz:		// extended multipath channel model
-		this->Channel.PDP_dB << 0.0 << -1.5 << -1.4 << -3.6 << -0.6 << -9.1 << -7.0 << -12.0 << -16.9 << endr
+	case Ch_type::EVA5Hz:		// extended multipath channel model
+		this->channel.PDP_dB << 0.0 << -1.5 << -1.4 << -3.6 << -0.6 << -9.1 << -7.0 << -12.0 << -16.9 << endr
 			<< 0.0 << 30.0 * pow(10.0, -9.0) << 150.0 * pow(10.0, -9.0) << 310.0 * pow(10.0, -9.0) << 370.0 * pow(10.0, -9.0) << 710.0 * pow(10.0, -9.0) << 1090.0 * pow(10.0, -9.0) << 1730.0 * pow(10.0, -9.0) << 2510.0 * pow(10.0, -9.0) << endr;
 		this->Cov_Matrix_time(0, 0) = 1.0 + pow(10.0, -0.15) + pow(10.0, -0.14);
 		this->Cov_Matrix_time(1, 1) = pow(10.0, -0.36) + pow(10.0, -0.06) + pow(10.0, -0.91);
@@ -579,8 +579,8 @@ void ModuleParameterMIMO::module_Parameter_MIMO(const ParameterInit &init)
 		this->Cov_Matrix_time(3, 3) = pow(10.0, -1.2);
 		this->Cov_Matrix_time(5, 5) = pow(10.0, -1.69);
 		break;
-	case ch_type::EVA70Hz:		// extended multipath channel model
-		this->Channel.PDP_dB << 0.0 << -1.5 << -1.4 << -3.6 << -0.6 << -9.1 << -7.0 << -12.0 << -16.9 << endr
+	case Ch_type::EVA70Hz:		// extended multipath channel model
+		this->channel.PDP_dB << 0.0 << -1.5 << -1.4 << -3.6 << -0.6 << -9.1 << -7.0 << -12.0 << -16.9 << endr
 			<< 0.0 << 30.0 * pow(10.0, -9.0) << 150.0 * pow(10.0, -9.0) << 310.0 * pow(10.0, -9.0) << 370.0 * pow(10.0, -9.0) << 710.0 * pow(10.0, -9.0) << 1090.0 * pow(10.0, -9.0) << 1730.0 * pow(10.0, -9.0) << 20510.0 * pow(10.0, -9.0) << endr;
 		this->Cov_Matrix_time(0, 0) = 2.0 + 3.0 * pow(10.0, -0.1);
 		this->Cov_Matrix_time(1, 1) = 1.0;
@@ -588,19 +588,19 @@ void ModuleParameterMIMO::module_Parameter_MIMO(const ParameterInit &init)
 		this->Cov_Matrix_time(4, 4) = pow(10.0, -0.5);
 		this->Cov_Matrix_time(10, 10) = pow(10.0, -0.7);
 		break;
-	case ch_type::ETU70Hz:		// extended multipath channel model
-		this->Channel.PDP_dB << -1.0 << -1.0 << -1.0 << 0.0 << 0.0 << 0.0 << -3.0 << -5.0 << -7.0 << endr
+	case Ch_type::ETU70Hz:		// extended multipath channel model
+		this->channel.PDP_dB << -1.0 << -1.0 << -1.0 << 0.0 << 0.0 << 0.0 << -3.0 << -5.0 << -7.0 << endr
 			<< 0.0 << 50.0 * pow(10.0, -9.0) << 120.0 * pow(10.0, -9.0) << 200.0 * pow(10.0, -9.0) << 230.0 * pow(10.0, -9.0) << 500.0 * pow(10.0, -9.0) << 1600.0 * pow(10.0, -9.0) << 2300.0 * pow(10.0, -9.0) << 5000.0 * pow(10.0, -9.0) << endr;
 		break;
-	case ch_type::ETU300Hz:
-		this->Channel.PDP_dB << -1.0 << -1.0 << -1.0 << 0.0 << 0.0 << 0.0 << -3.0 << -5.0 << -7.0 << endr
+	case Ch_type::ETU300Hz:
+		this->channel.PDP_dB << -1.0 << -1.0 << -1.0 << 0.0 << 0.0 << 0.0 << -3.0 << -5.0 << -7.0 << endr
 			<< 0.0 << 50.0 * pow(10.0, -9.0) << 120.0 * pow(10.0, -9.0) << 200.0 * pow(10.0, -9.0) << 230.0 * pow(10.0, -9.0) << 500.0 * pow(10.0, -9.0) << 1600.0 * pow(10.0, -9.0) << 2300.0 * pow(10.0, -9.0) << 5000.0 * pow(10.0, -9.0) << endr;
 		break;
-	case ch_type::AWGN:
-	case ch_type::winner_II:
+	case Ch_type::AWGN:
+	case Ch_type::winner_II:
 		this->Cov_Matrix_time(0, 0) = 1.0;
 		break;
-	case ch_type::CDL_A:
+	case Ch_type::CDL_A:
 		this->CDL
 			<< 0.0000 << -13.4 << -178.1 <<   51.3 <<  50.2 << 125.4 << endr
 			<< 0.3819 <<   0.0 <<   -4.2 << -152.7 <<  93.2 <<  91.3 << endr
@@ -632,24 +632,24 @@ void ModuleParameterMIMO::module_Parameter_MIMO(const ParameterInit &init)
 		this->c_ZSA =   3.0;
 		this->XPR_dB = 10.0;
 
-		this->Channel.PDP_dB = zeros(arma::size(CDL.t()));
-		this->Channel.PDP_dB = join_horiz(this->CDL.col(1), this->CDL.col(0) * this->DS).t();
+		this->channel.PDP_dB = zeros(arma::size(CDL.t()));
+		this->channel.PDP_dB = join_horiz(this->CDL.col(1), this->CDL.col(0) * this->DS).t();
 
-		this->Cov_Matrix_time(0,  0)  = pow(10.0, this->Channel.PDP_dB(0,  0) / 10.0);
-		this->Cov_Matrix_time(1,  1)  = pow(10.0, this->Channel.PDP_dB(0,  1) / 10.0) + pow(10.0, this->Channel.PDP_dB(0, 2) / 10.0) + pow(10.0, this->Channel.PDP_dB(0, 4) / 10.0);
-		this->Cov_Matrix_time(2,  2)  = pow(10.0, this->Channel.PDP_dB(0,  3) / 10.0) + pow(10.0, this->Channel.PDP_dB(0, 5) / 10.0) + pow(10.0, this->Channel.PDP_dB(0, 6) / 10.0) + pow(10.0, this->Channel.PDP_dB(0, 7) / 10.0) + pow(10.0, this->Channel.PDP_dB(0, 8) / 10.0);
-		this->Cov_Matrix_time(5,  5)  = pow(10.0, this->Channel.PDP_dB(0,  9) / 10.0);
-		this->Cov_Matrix_time(6,  6)  = pow(10.0, this->Channel.PDP_dB(0, 10) / 10.0);
-		this->Cov_Matrix_time(7,  7)  = pow(10.0, this->Channel.PDP_dB(0, 11) / 10.0) + pow(10.0, this->Channel.PDP_dB(0, 12) / 10.0);
-		this->Cov_Matrix_time(8,  8)  = pow(10.0, this->Channel.PDP_dB(0, 13) / 10.0) + pow(10.0, this->Channel.PDP_dB(0, 14) / 10.0);
-		this->Cov_Matrix_time(9,  9)  = pow(10.0, this->Channel.PDP_dB(0, 15) / 10.0);
-		this->Cov_Matrix_time(13, 13) = pow(10.0, this->Channel.PDP_dB(0, 16) / 10.0);
-		this->Cov_Matrix_time(14, 14) = pow(10.0, this->Channel.PDP_dB(0, 17) / 10.0) + pow(10.0, this->Channel.PDP_dB(0, 18) / 10.0);
-		this->Cov_Matrix_time(15, 15) = pow(10.0, this->Channel.PDP_dB(0, 19) / 10.0) + pow(10.0, this->Channel.PDP_dB(0, 20) / 10.0);
-		this->Cov_Matrix_time(16, 16) = pow(10.0, this->Channel.PDP_dB(0, 21) / 10.0);
-		this->Cov_Matrix_time(30, 30) = pow(10.0, this->Channel.PDP_dB(0, 22) / 10.0);
+		this->Cov_Matrix_time(0,  0)  = pow(10.0, this->channel.PDP_dB(0,  0) / 10.0);
+		this->Cov_Matrix_time(1,  1)  = pow(10.0, this->channel.PDP_dB(0,  1) / 10.0) + pow(10.0, this->channel.PDP_dB(0, 2) / 10.0) + pow(10.0, this->channel.PDP_dB(0, 4) / 10.0);
+		this->Cov_Matrix_time(2,  2)  = pow(10.0, this->channel.PDP_dB(0,  3) / 10.0) + pow(10.0, this->channel.PDP_dB(0, 5) / 10.0) + pow(10.0, this->channel.PDP_dB(0, 6) / 10.0) + pow(10.0, this->channel.PDP_dB(0, 7) / 10.0) + pow(10.0, this->channel.PDP_dB(0, 8) / 10.0);
+		this->Cov_Matrix_time(5,  5)  = pow(10.0, this->channel.PDP_dB(0,  9) / 10.0);
+		this->Cov_Matrix_time(6,  6)  = pow(10.0, this->channel.PDP_dB(0, 10) / 10.0);
+		this->Cov_Matrix_time(7,  7)  = pow(10.0, this->channel.PDP_dB(0, 11) / 10.0) + pow(10.0, this->channel.PDP_dB(0, 12) / 10.0);
+		this->Cov_Matrix_time(8,  8)  = pow(10.0, this->channel.PDP_dB(0, 13) / 10.0) + pow(10.0, this->channel.PDP_dB(0, 14) / 10.0);
+		this->Cov_Matrix_time(9,  9)  = pow(10.0, this->channel.PDP_dB(0, 15) / 10.0);
+		this->Cov_Matrix_time(13, 13) = pow(10.0, this->channel.PDP_dB(0, 16) / 10.0);
+		this->Cov_Matrix_time(14, 14) = pow(10.0, this->channel.PDP_dB(0, 17) / 10.0) + pow(10.0, this->channel.PDP_dB(0, 18) / 10.0);
+		this->Cov_Matrix_time(15, 15) = pow(10.0, this->channel.PDP_dB(0, 19) / 10.0) + pow(10.0, this->channel.PDP_dB(0, 20) / 10.0);
+		this->Cov_Matrix_time(16, 16) = pow(10.0, this->channel.PDP_dB(0, 21) / 10.0);
+		this->Cov_Matrix_time(30, 30) = pow(10.0, this->channel.PDP_dB(0, 22) / 10.0);
 		break;
-	case ch_type::CDL_B:
+	case Ch_type::CDL_B:
 		this->CDL
 			<< 0.0000 <<   0.0 <<    9.3 << -173.3 << 105.8 << 78.9 << endr
 			<< 0.1072 <<  -2.2 <<    9.3 << -173.3 << 105.8 << 78.9 << endr
@@ -681,23 +681,23 @@ void ModuleParameterMIMO::module_Parameter_MIMO(const ParameterInit &init)
 		this->c_ZSA =  8.0;
 		this->XPR_dB = 8.0;
 
-		this->Channel.PDP_dB = zeros(arma::size(CDL.t()));
-		this->Channel.PDP_dB = join_horiz(this->CDL.col(1), this->CDL.col(0) * this->DS).t();
+		this->channel.PDP_dB = zeros(arma::size(CDL.t()));
+		this->channel.PDP_dB = join_horiz(this->CDL.col(1), this->CDL.col(0) * this->DS).t();
 
-		this->Cov_Matrix_time(0, 0) = pow(10.0, this->Channel.PDP_dB(0, 0) / 10.0) + pow(10.0, this->Channel.PDP_dB(0, 1) / 10.0);
-		this->Cov_Matrix_time(1, 1) = pow(10.0, this->Channel.PDP_dB(0, 2) / 10.0) + pow(10.0, this->Channel.PDP_dB(0, 3) / 10.0) + pow(10.0, this->Channel.PDP_dB(0, 4) / 10.0) + pow(10.0, this->Channel.PDP_dB(0, 5) / 10.0) + pow(10.0, this->Channel.PDP_dB(0, 6) / 10.0) + pow(10.0, this->Channel.PDP_dB(0, 8) / 10.0) + pow(10.0, this->Channel.PDP_dB(0, 9) / 10.0);
-		this->Cov_Matrix_time(2, 2) = pow(10.0, this->Channel.PDP_dB(0, 7) / 10.0) + pow(10.0, this->Channel.PDP_dB(0, 10) / 10.0) + pow(10.0, this->Channel.PDP_dB(0, 11) / 10.0);
-		this->Cov_Matrix_time(3, 3) = pow(10.0, this->Channel.PDP_dB(0, 12) / 10.0);
-		this->Cov_Matrix_time(4, 4) = pow(10.0, this->Channel.PDP_dB(0, 13) / 10.0);
-		this->Cov_Matrix_time(5, 5) = pow(10.0, this->Channel.PDP_dB(0, 14) / 10.0) + pow(10.0, this->Channel.PDP_dB(0, 15) / 10.0);
-		this->Cov_Matrix_time(6, 6) = pow(10.0, this->Channel.PDP_dB(0, 16) / 10.0);
-		this->Cov_Matrix_time(9, 9) = pow(10.0, this->Channel.PDP_dB(0, 17) / 10.0) + pow(10.0, this->Channel.PDP_dB(0, 18) / 10.0);
-		this->Cov_Matrix_time(11, 11) = pow(10.0, this->Channel.PDP_dB(0, 19) / 10.0);
-		this->Cov_Matrix_time(13, 13) = pow(10.0, this->Channel.PDP_dB(0, 20) / 10.0) + pow(10.0, this->Channel.PDP_dB(0, 21) / 10.0);
-		this->Cov_Matrix_time(15, 15) = pow(10.0, this->Channel.PDP_dB(0, 12) / 10.0);
+		this->Cov_Matrix_time(0, 0) = pow(10.0, this->channel.PDP_dB(0, 0) / 10.0) + pow(10.0, this->channel.PDP_dB(0, 1) / 10.0);
+		this->Cov_Matrix_time(1, 1) = pow(10.0, this->channel.PDP_dB(0, 2) / 10.0) + pow(10.0, this->channel.PDP_dB(0, 3) / 10.0) + pow(10.0, this->channel.PDP_dB(0, 4) / 10.0) + pow(10.0, this->channel.PDP_dB(0, 5) / 10.0) + pow(10.0, this->channel.PDP_dB(0, 6) / 10.0) + pow(10.0, this->channel.PDP_dB(0, 8) / 10.0) + pow(10.0, this->channel.PDP_dB(0, 9) / 10.0);
+		this->Cov_Matrix_time(2, 2) = pow(10.0, this->channel.PDP_dB(0, 7) / 10.0) + pow(10.0, this->channel.PDP_dB(0, 10) / 10.0) + pow(10.0, this->channel.PDP_dB(0, 11) / 10.0);
+		this->Cov_Matrix_time(3, 3) = pow(10.0, this->channel.PDP_dB(0, 12) / 10.0);
+		this->Cov_Matrix_time(4, 4) = pow(10.0, this->channel.PDP_dB(0, 13) / 10.0);
+		this->Cov_Matrix_time(5, 5) = pow(10.0, this->channel.PDP_dB(0, 14) / 10.0) + pow(10.0, this->channel.PDP_dB(0, 15) / 10.0);
+		this->Cov_Matrix_time(6, 6) = pow(10.0, this->channel.PDP_dB(0, 16) / 10.0);
+		this->Cov_Matrix_time(9, 9) = pow(10.0, this->channel.PDP_dB(0, 17) / 10.0) + pow(10.0, this->channel.PDP_dB(0, 18) / 10.0);
+		this->Cov_Matrix_time(11, 11) = pow(10.0, this->channel.PDP_dB(0, 19) / 10.0);
+		this->Cov_Matrix_time(13, 13) = pow(10.0, this->channel.PDP_dB(0, 20) / 10.0) + pow(10.0, this->channel.PDP_dB(0, 21) / 10.0);
+		this->Cov_Matrix_time(15, 15) = pow(10.0, this->channel.PDP_dB(0, 12) / 10.0);
 
 		break;
-	case ch_type::CDL_C:
+	case Ch_type::CDL_C:
 		this->CDL
 			<< 0.0000 <<  -4.4 <<  -46.6 << -101.0 <<  97.2 <<  87.6 << endr
 			<< 0.2099 <<  -1.2 <<  -22.8 <<  120.0 <<  98.6 <<  72.1 << endr
@@ -724,8 +724,8 @@ void ModuleParameterMIMO::module_Parameter_MIMO(const ParameterInit &init)
 			<< 7.0427 << -21.6 <<  119.5 <<  -21.9 << 105.2 <<  58.0 << endr
 			<< 8.6523 << -22.8 << -123.8 <<   33.6 << 107.8 <<  57.0 << endr;
 
-		this->Channel.PDP_dB = zeros(arma::size(CDL.t()));
-		this->Channel.PDP_dB = join_horiz(CDL.col(1), (CDL.col(0) * this->DS)).t();
+		this->channel.PDP_dB = zeros(arma::size(CDL.t()));
+		this->channel.PDP_dB = join_horiz(CDL.col(1), (CDL.col(0) * this->DS)).t();
 
 		this->c_ASD =  2.0;
 		this->c_ASA = 15.0;
@@ -734,17 +734,17 @@ void ModuleParameterMIMO::module_Parameter_MIMO(const ParameterInit &init)
 		this->XPR_dB = 7.0;
 
 		/* calculate cov_matrix_time */
-		PDP_Delay = zeros<rowvec>(this->Channel.PDP_dB.n_cols);
-		PDP_Delay = this->Channel.PDP_dB.row(1);
-		New_PDP_Delay_samples = zeros<rowvec>(this->Channel.PDP_dB.n_cols);
+		PDP_Delay = zeros<rowvec>(this->channel.PDP_dB.n_cols);
+		PDP_Delay = this->channel.PDP_dB.row(1);
+		New_PDP_Delay_samples = zeros<rowvec>(this->channel.PDP_dB.n_cols);
 		New_PDP_Delay_samples = round(PDP_Delay * this->Fs);
 		for (size_t ind = 0; ind < New_PDP_Delay_samples.size(); ind++) {
 			diag_index = New_PDP_Delay_samples(ind);
-			this->Cov_Matrix_time(diag_index, diag_index) = this->Cov_Matrix_time(diag_index, diag_index) + pow(10.0, this->Channel.PDP_dB(0, ind) / 10.0);
+			this->Cov_Matrix_time(diag_index, diag_index) = this->Cov_Matrix_time(diag_index, diag_index) + pow(10.0, this->channel.PDP_dB(0, ind) / 10.0);
 		}
 
 		break;
-	case ch_type::CDL_D:
+	case Ch_type::CDL_D:
 		this->CDL
 			<< 0.0    <<  -0.2 <<    0.0 << -180.0 <<  98.5 << 81.5 << endr
 			<< 0.0    << -13.5 <<    0.0 << -180.0 <<  98.5 << 81.5 << endr
@@ -761,8 +761,8 @@ void ModuleParameterMIMO::module_Parameter_MIMO(const ParameterInit &init)
 			<< 9.708  << -30.0 << -132.1 <<   -9.1 <<  80.3 << 70.6 << endr
 			<< 12.525 << -27.7 <<   77.2 <<  -83.8 <<  86.5 << 72.9 << endr;
 
-		this->Channel.PDP_dB = zeros(arma::size(CDL.t()));
-		this->Channel.PDP_dB = join_horiz(CDL.col(1), (CDL.col(0) * this->DS)).t();
+		this->channel.PDP_dB = zeros(arma::size(CDL.t()));
+		this->channel.PDP_dB = join_horiz(CDL.col(1), (CDL.col(0) * this->DS)).t();
 
 		this->c_ASD  =  5.0;
 		this->c_ASA  =  8.0;
@@ -771,7 +771,7 @@ void ModuleParameterMIMO::module_Parameter_MIMO(const ParameterInit &init)
 		this->XPR_dB = 11.0;
 
 		break;
-	case ch_type::CDL_E:
+	case Ch_type::CDL_E:
 		this->CDL
 			<<  0.000  <<  -0.03 <<   0.0 << -180.0 <<  99.6 << 80.4 << endr
 			<<  0.000  << -22.03 <<   0.0 << -180.0 <<  99.6 << 80.4 << endr
@@ -789,8 +789,8 @@ void ModuleParameterMIMO::module_Parameter_MIMO(const ParameterInit &init)
 			<< 12.0034 << -29.8  <<  55.9 <<  -36.2 <<  95.6 << 88.6 << endr
 			<< 20.6419 << -29.2  <<  57.6 <<  -26.0 << 104.6 << 78.3 << endr;
 
-		this->Channel.PDP_dB = zeros(arma::size(CDL.t()));
-		this->Channel.PDP_dB = join_horiz(CDL.col(1), (CDL.col(0) * this->DS)).t();
+		this->channel.PDP_dB = zeros(arma::size(CDL.t()));
+		this->channel.PDP_dB = join_horiz(CDL.col(1), (CDL.col(0) * this->DS)).t();
 
 		this->c_ASD  =  5.0;
 		this->c_ASA  = 11.0;
@@ -801,7 +801,7 @@ void ModuleParameterMIMO::module_Parameter_MIMO(const ParameterInit &init)
 		break;
 	default:
 		cout << "ERROR: Channel not supported" << endl;
-	}   /* end of switch (this->Channel.type) */
+	}   /* end of switch (this->channel.type) */
 
 	this->Cov_Matrix_time = this->Cov_Matrix_time / sum(this->Cov_Matrix_time.diag());
 	cx_mat fft_matrix = fft(eye(this->size_fft, this->size_fft));
@@ -835,7 +835,7 @@ void ModuleParameterMIMO::module_Parameter_MIMO(const ParameterInit &init)
 	this->Cov_Matrix_freq = temp_Cov_Matrix_freq;
 
 	this->user_speed = init.user_speed;
-	this->HARQ_switch = init.HARQ_switch;
+	this->harq_switch = init.harq_switch;
 
 	/* get CQI Table */
 	getCQITable();

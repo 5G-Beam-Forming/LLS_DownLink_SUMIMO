@@ -26,7 +26,7 @@ void ChannelOutput_TDL(ModuleParameterMIMO &para, colvec &pathDelays, colvec &pa
 
 	int			Nt = para.num_Tx_antenna;
 	int			Nr = para.num_Rx_antenna;
-	ch_type		channel_type = para.Channel.type;
+	Ch_type		channel_type = para.channel.type;
 	double		user_speed = para.user_speed;
 	rowvec		t = para.t;
 
@@ -41,9 +41,9 @@ void ChannelOutput_TDL(ModuleParameterMIMO &para, colvec &pathDelays, colvec &pa
 
 	/* Antenna configuration */
 	// Transmit array type (ULA or URA)
-	TxArrayType TxArrayType = para.TxArrayType;	// for calibration
+	TxArrayType TxArrayType = para.txArrayType;	// for calibration
 	// Receive array type (ULA or URA)
-	RxArrayType RxArrayType = para.RxArrayType;	// for calibration
+	RxArrayType RxArrayType = para.rxArrayType;	// for calibration
 	// Transmit antenna spacing in wavelengths (0.1-100)
 	double		TxAnt = para.Tx_d_lambda;
 	// Receive antenna spacing in wavelengths (0.1-100)
@@ -85,9 +85,9 @@ void ChannelOutput_TDL(ModuleParameterMIMO &para, colvec &pathDelays, colvec &pa
 			H(i, j) = zeros<cx_mat>(T, nTap);
 
 	switch (channel_type) {
-	case ch_type::TDL_A:
-	case ch_type::TDL_B:
-	case ch_type::TDL_C:
+	case Ch_type::TDL_A:
+	case Ch_type::TDL_B:
+	case Ch_type::TDL_C:
 		for (uword ind_tap = 0; ind_tap < nTap; ind_tap++) {
 			if (para.Tx_pol == 2 && para.Rx_pol == 2)
 				Rand_phase = randu(Nr / 2, Nt / 2, Num_ray);
@@ -159,8 +159,8 @@ void ChannelOutput_TDL(ModuleParameterMIMO &para, colvec &pathDelays, colvec &pa
 			}
 		}
 		break;
-	case ch_type::TDL_D:
-	case ch_type::TDL_E:
+	case Ch_type::TDL_D:
+	case Ch_type::TDL_E:
 		for (uword ind_tap = 0; ind_tap < nTap; ind_tap++) {
 			if (para.Tx_pol == 2 && para.Rx_pol == 2) {
 				Rand_phase = randu(Nr / 2, Nt / 2, Num_ray);

@@ -87,40 +87,40 @@ void ModuleChannel5G::Chan_Matrix(ModuleParameterMIMO &para, int Subframe_index)
 	/* code start */
 	this->FFT_pts_num = para.size_fft;
 
-	switch (para.Channel.type) {
-	case ch_type::AWGN:
+	switch (para.channel.type) {
+	case Ch_type::AWGN:
 		this->Output.time = ones<cx_cube>(para.num_Rx_antenna, para.num_Tx_antenna, 1);
 		break;
-	case ch_type::flat_Rayleigh:
+	case Ch_type::flat_Rayleigh:
 		this->Output.time = zeros<cx_cube>(para.num_Rx_antenna, para.num_Tx_antenna, 1);
 		time2D = zeros<cx_mat>(para.num_Rx_antenna, para.num_Tx_antenna);
 		time2D = 1.0 / sqrt(2.0) * (randn<mat>(para.num_Rx_antenna, para.num_Tx_antenna) + cx_double(0, 1) * randn<mat>(para.num_Rx_antenna, para.num_Tx_antenna));
 		this->Output.time.slice(0) = time2D;
 		time2D.reset();		// local memory deallocation
 		break;
-	case ch_type::CDL_A:
-	case ch_type::CDL_B:
-	case ch_type::CDL_C:
-	case ch_type::CDL_D:
-	case ch_type::CDL_E:
-	case ch_type::TDL_A:
-	case ch_type::TDL_B:
-	case ch_type::TDL_C:
-	case ch_type::TDL_D:
-	case ch_type::TDL_E:
-		switch (para.Channel.type) {
-		case ch_type::CDL_A:
-		case ch_type::CDL_B:
-		case ch_type::CDL_C:
-		case ch_type::CDL_D:
-		case ch_type::CDL_E:
+	case Ch_type::CDL_A:
+	case Ch_type::CDL_B:
+	case Ch_type::CDL_C:
+	case Ch_type::CDL_D:
+	case Ch_type::CDL_E:
+	case Ch_type::TDL_A:
+	case Ch_type::TDL_B:
+	case Ch_type::TDL_C:
+	case Ch_type::TDL_D:
+	case Ch_type::TDL_E:
+		switch (para.channel.type) {
+		case Ch_type::CDL_A:
+		case Ch_type::CDL_B:
+		case Ch_type::CDL_C:
+		case Ch_type::CDL_D:
+		case Ch_type::CDL_E:
 			ChannelOutput_CDL(para, this->PDP_Delay, this->PDP_Power, this->Output_time_tap, this->Output.angle_first);
 			break;
-		case ch_type::TDL_A:
-		case ch_type::TDL_B:
-		case ch_type::TDL_C:
-		case ch_type::TDL_D:
-		case ch_type::TDL_E:
+		case Ch_type::TDL_A:
+		case Ch_type::TDL_B:
+		case Ch_type::TDL_C:
+		case Ch_type::TDL_D:
+		case Ch_type::TDL_E:
 			ChannelOutput_TDL(para, this->PDP_Delay, this->PDP_Power, this->Output_time_tap);
 		}
 
@@ -132,10 +132,10 @@ void ModuleChannel5G::Chan_Matrix(ModuleParameterMIMO &para, int Subframe_index)
 		New_PDP_Delay_unique = unique(this->New_PDP_Delay_samples);
 		this->Faders_num = New_PDP_Delay_unique.n_elem;
 
-		switch (para.Channel.time_fading) {
-		case ch_mode::Block_Fading:
-			if (para.Channel.time_correlation == time_correlation::independent) {
-				if (para.method_interpolation == method_interpolation::nearest_neighbor) {
+		switch (para.channel.time_fading) {
+		case Ch_mode::Block_Fading:
+			if (para.channel.time_correlation == Time_correlation::independent) {
+				if (para.method_interpolation == Method_interpolation::nearest_neighbor) {
 					this->Output.time = zeros<cx_cube>(para.num_Rx_antenna, para.num_Tx_antenna, this->New_PDP_Delay_samples(this->New_PDP_Delay_samples.n_elem - 1) + 1);
 					distinct_New_PDP_Delay_samples = unique(this->New_PDP_Delay_samples);
 
@@ -161,7 +161,7 @@ void ModuleChannel5G::Chan_Matrix(ModuleParameterMIMO &para, int Subframe_index)
 					H_Norm = sqrt(temp_sum);
 					this->Output.time = this->Output.time / H_Norm;
 				}
-				else if (para.method_interpolation == method_interpolation::sinc_interpolation) {
+				else if (para.method_interpolation == Method_interpolation::sinc_interpolation) {
 
 					distinct_New_PDP_Delay_samples = unique(this->New_PDP_Delay_samples);
 
@@ -212,19 +212,19 @@ void ModuleChannel5G::Chan_Matrix(ModuleParameterMIMO &para, int Subframe_index)
 
 				}
 			}
-			else if (para.Channel.time_correlation == time_correlation::correlated) {
+			else if (para.channel.time_correlation == Time_correlation::correlated) {
 				;	// empty statement.
 			}
 			break;
-		case ch_mode::Fast_Fading:
+		case Ch_mode::Fast_Fading:
 			;    // empty statment;
-		}   /* end of switch (para.Channel.time_fading) */
+		}   /* end of switch (para.channel.time_fading) */
 		break;
 
 	default:
-		switch (para.Channel.time_fading) {
-		case ch_mode::Block_Fading:
-			if (para.Channel.time_correlation == time_correlation::correlated) {
+		switch (para.channel.time_fading) {
+		case Ch_mode::Block_Fading:
+			if (para.channel.time_correlation == Time_correlation::correlated) {
 
 				Time_temp = (Subframe_index - 1) * this->Subframe_Duration;
 
@@ -245,25 +245,25 @@ void ModuleChannel5G::Chan_Matrix(ModuleParameterMIMO &para, int Subframe_index)
 				Img_Part = sin(Gamma_temp) * cos(para.w_d * Time_temp * cos(Angle_of_incoming) + Beta_temp);
 				Chan_Sig.slice(0) = 2.0 / sqrt(2.0 * para.sin_num) * sum(Rel_Part + cx_double(0, 1) * Img_Part, 2);
 
-				printf("Module_Channel_5G.cpp line 258: Code Incomplete!\n");
+				printf("Module_channel_5G.cpp line 258: Code Incomplete!\n");
 			}
-			else if (para.Channel.time_correlation == time_correlation::independent) {
+			else if (para.channel.time_correlation == Time_correlation::independent) {
 				Chan_Sig = (randn(para.num_Rx_antenna, para.num_Tx_antenna, this->Faders_num)
 					+ cx_double(0, 1) * randn(para.num_Rx_antenna, para.num_Tx_antenna, this->Faders_num)) / sqrt(2.0);
 			}
 			break;
-		case ch_mode::Fast_Fading:		// coding incomplete
+		case Ch_mode::Fast_Fading:		// coding incomplete
 			Subframe_Sym_num = 2.0 * (this->CP_pts_num(0) + (para.num_symb - 1) * this->CP_pts_num(1) + this->FFT_pts_num * para.num_symb);
 			Samp_Time = Time_symbol / this->FFT_pts_num;
 			this->Fast_Fading_Chan_num = Subframe_Sym_num;
 			
-			printf("Module_Channel_5G.cpp line 258: Code Incomplete!\n");
+			printf("Module_channel_5G.cpp line 258: Code Incomplete!\n");
 		}
 
 
 		/* Interpolation Part */
 		switch (para.method_interpolation) {
-		case method_interpolation::sinc_interpolation:
+		case Method_interpolation::sinc_interpolation:
 			Number_of_Samples = 144.0 / (15000.0 * 2048.0) * para.subcarrier_spacing * this->FFT_pts_num;
 
 			for (i = 0; i <= Number_of_Samples; i++)
@@ -334,39 +334,39 @@ void ModuleChannel5G::Chan_Matrix(ModuleParameterMIMO &para, int Subframe_index)
 					this->Output.time4D(i) = Chan_Out4D(i) / norm_coef;
 			}
 
-			if (para.Channel.type == ch_type::Rayleigh2 && para.Channel.time_fading == ch_mode::Fast_Fading)
+			if (para.channel.type == Ch_type::Rayleigh2 && para.channel.time_fading == Ch_mode::Fast_Fading)
 				this->Output.time = Chan_Sig;
 
 			break;
-		case method_interpolation::nearest_neighbor:
+		case Method_interpolation::nearest_neighbor:
 			if (Chan_Sig_dims == 3) {	/* Block_Fading */
 
-				switch (para.Channel.type) {
-				case ch_type::PedA:
-				case ch_type::PedB:
-				case ch_type::VehA:
-				case ch_type::VehB:
-				case ch_type::Rayleigh2:
-				case ch_type::TDL_A:
-				case ch_type::TDL_B:
-				case ch_type::TDL_C:
-				case ch_type::TDL_D:
-				case ch_type::TDL_E:
-					Rx_Correlation = ones<cube>(para.Channel.PDP_dB.n_cols, para.num_Rx_antenna, para.num_Tx_antenna);
-					Tx_Correlation = ones<cube>(para.Channel.PDP_dB.n_cols, para.num_Rx_antenna, para.num_Tx_antenna);
-					for (uword Index_corr_temp = 0; Index_corr_temp < para.Channel.PDP_dB.n_cols; Index_corr_temp++) {
+				switch (para.channel.type) {
+				case Ch_type::PedA:
+				case Ch_type::PedB:
+				case Ch_type::VehA:
+				case Ch_type::VehB:
+				case Ch_type::Rayleigh2:
+				case Ch_type::TDL_A:
+				case Ch_type::TDL_B:
+				case Ch_type::TDL_C:
+				case Ch_type::TDL_D:
+				case Ch_type::TDL_E:
+					Rx_Correlation = ones<cube>(para.channel.PDP_dB.n_cols, para.num_Rx_antenna, para.num_Tx_antenna);
+					Tx_Correlation = ones<cube>(para.channel.PDP_dB.n_cols, para.num_Rx_antenna, para.num_Tx_antenna);
+					for (uword Index_corr_temp = 0; Index_corr_temp < para.channel.PDP_dB.n_cols; Index_corr_temp++) {
 						Rx_Correlation.slice(Index_corr_temp) = eye(para.num_Rx_antenna, para.num_Rx_antenna);
 						Tx_Correlation.slice(Index_corr_temp) = eye(para.num_Tx_antenna, para.num_Tx_antenna);
 					}
 					break;
-				case ch_type::PedBcorr:
-				case ch_type::EVA5Hz:
-				case ch_type::EVA70Hz:
-				case ch_type::ETU70Hz:
-				case ch_type::ETU300Hz:
-					Rx_Correlation = ones(para.Channel.PDP_dB.n_cols, para.num_Rx_antenna, para.num_Tx_antenna);
-					Tx_Correlation = ones(para.Channel.PDP_dB.n_cols, para.num_Rx_antenna, para.num_Tx_antenna);
-					for (uword Index_corr_temp = 0; Index_corr_temp < para.Channel.PDP_dB.n_cols; Index_corr_temp++) {
+				case Ch_type::PedBcorr:
+				case Ch_type::EVA5Hz:
+				case Ch_type::EVA70Hz:
+				case Ch_type::ETU70Hz:
+				case Ch_type::ETU300Hz:
+					Rx_Correlation = ones(para.channel.PDP_dB.n_cols, para.num_Rx_antenna, para.num_Tx_antenna);
+					Tx_Correlation = ones(para.channel.PDP_dB.n_cols, para.num_Rx_antenna, para.num_Tx_antenna);
+					for (uword Index_corr_temp = 0; Index_corr_temp < para.channel.PDP_dB.n_cols; Index_corr_temp++) {
 						Rx_Correlation.slice(Index_corr_temp) = eye(para.num_Rx_antenna, para.num_Rx_antenna) + para.Channel_coefRX * ones(para.num_Rx_antenna, para.num_Rx_antenna) - para.Channel_coefRX * eye(para.num_Rx_antenna, para.num_Rx_antenna);
 						Tx_Correlation.slice(Index_corr_temp) = eye(para.num_Tx_antenna, para.num_Tx_antenna) + para.Channel_coefTx * ones(para.num_Tx_antenna, para.num_Tx_antenna) - para.Channel_coefTx * eye(para.num_Tx_antenna, para.num_Tx_antenna);
 					}
@@ -408,7 +408,7 @@ void ModuleChannel5G::Chan_Matrix(ModuleParameterMIMO &para, int Subframe_index)
 				}
 			}
 
-		}   /* end of switch(para.Channel.type) */
+		}   /* end of switch(para.channel.type) */
 
 	}   /* end of switch (para.method_interpolation) */
 
@@ -450,7 +450,7 @@ void ModuleChannel5G::Chan_H_fft(ModuleParameterMIMO &para) {
 
 	this->Subcarrier_Total = (para.size_fft - (para.size_fft - (para.num_RB * para.num_sc) / 2)) + ((para.num_RB * para.num_sc) / 2);
 
-	if (para.Channel.type == ch_type::AWGN) {
+	if (para.channel.type == Ch_type::AWGN) {
 		field<cx_mat> FFT_Temp(1, 1);
 		FFT_Temp(0, 0) = zeros<cx_mat>(para.num_Rx_antenna, para.num_Tx_antenna);
 		FFT_Temp(0, 0) = this->Output.time;
@@ -460,7 +460,7 @@ void ModuleChannel5G::Chan_H_fft(ModuleParameterMIMO &para) {
 		FFT_Temp(0, 0).reset();		/* memory deallocation */
 		FFT_Temp.reset();
 	}
-	else if (para.Channel.type == ch_type::flat_Rayleigh) {
+	else if (para.channel.type == Ch_type::flat_Rayleigh) {
 		field<cx_mat> H_temp(1, 1);
 		H_temp(0, 0) = zeros<cx_mat>(para.num_Rx_antenna, para.num_Tx_antenna);
 		H_temp(0, 0) = this->Output.time;
@@ -482,7 +482,7 @@ void ModuleChannel5G::Chan_H_fft(ModuleParameterMIMO &para) {
 		for (uword i = 0; i < ttmp_fft_size; i++)
 			this->Output.fft(i) = zeros<cx_cube>(para.num_symb, para.num_Rx_antenna, para.num_Tx_antenna);
 
-		if (para.Channel.time_fading == ch_mode::Block_Fading) {
+		if (para.channel.time_fading == Ch_mode::Block_Fading) {
 			for (uword ind_t = 0; ind_t < para.t.n_elem; ind_t++)
 				for (uword Ind_Rx = 0; Ind_Rx < para.num_Rx_antenna; Ind_Rx++)
 					for (uword Ind_Tx = 0; Ind_Tx < para.num_Tx_antenna; Ind_Tx++) {
@@ -506,7 +506,7 @@ void ModuleChannel5G::Chan_H_fft(ModuleParameterMIMO &para) {
 
 					}
 		}
-		else if (para.Channel.time_fading == ch_mode::Fast_Fading) {
+		else if (para.channel.time_fading == Ch_mode::Fast_Fading) {
 			;	// empty statement
 		}	/* end of if */
 

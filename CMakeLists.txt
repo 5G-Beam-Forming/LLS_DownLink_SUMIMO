@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 2.8.11)
-project (DL_SUMIMO.exe)
+project (DL_SUMIMO)
 
-add_executable (DL_SUMIMO
+add_executable (DL_SUMIMO.exe
 src/LDPC/method_ChannelCoding.cpp
 src/LDPC/RX_AWGN_Channel.cpp
 src/LDPC/Rx_ChannelDecoding.cpp
@@ -23,4 +23,4 @@ src/module_Parameter_MIMO.cpp
 src/module_UE_MIMO.cpp
 src/sumimo.cpp)
 
-target_link_libraries (DL_SUMIMO LINK_PUBLIC armadillo)
+target_link_libraries (DL_SUMIMO.exe LINK_PUBLIC armadillo)
